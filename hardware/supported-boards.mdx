@@ -1,0 +1,235 @@
+---
+title: Supported boards
+description: A complete list of boards and controllers supported by GP2040-CE, grouped by category.
+---
+
+GP2040-CE ships with pre-built firmware for a wide range of RP2040-based boards. Each board has its own configuration in the `configs/` directory of the repository — the directory name corresponds to the firmware build name you need to download.
+
+<Note>
+  For the Raspberry Pi Pico, download the **Pico** build. For the Raspberry Pi
+  Pico W, download the **PicoW** build. These are separate firmware files even
+  though the hardware is nearly identical.
+</Note>
+
+## Development boards
+
+General-purpose RP2040 development boards suitable for DIY builds. Pair with a screw terminal breakout or directly solder wires to the GPIO pads.
+
+<CardGroup cols={2}>
+  <Card title="Pico" icon="microchip">
+    Raspberry Pi Pico. The reference RP2040 board. GPIO 2–21 used for buttons, GPIO 0/1 for I2C display, GPIO 28 for RGB LED strip.
+  </Card>
+  <Card title="Pico2" icon="microchip">
+    Raspberry Pi Pico 2. The RP2350-based successor to the Pico, with the same form factor.
+  </Card>
+  <Card title="PicoW" icon="wifi">
+    Raspberry Pi Pico W. Identical pin mapping to the Pico build with wireless capability enabled.
+  </Card>
+  <Card title="SeeedXIAORP2040" icon="microchip">
+    Seeed Studio XIAO RP2040. A compact form-factor development board.
+  </Card>
+  <Card title="KB2040" icon="microchip">
+    Adafruit KB2040. An RP2040 board in a Pro Micro form factor, targeted at keyboard builds.
+  </Card>
+  <Card title="SparkFunProMicro" icon="microchip">
+    SparkFun Pro Micro RP2040. Pro Micro-compatible board based on the RP2040.
+  </Card>
+  <Card title="SparkFunProMicroRP2350" icon="microchip">
+    SparkFun Pro Micro RP2350. An RP2350-based variant of the SparkFun Pro Micro.
+  </Card>
+  <Card title="Liatris" icon="microchip">
+    Liatris by splitkb.com. An RP2040 board in a Pro Micro form factor.
+  </Card>
+  <Card title="WaveshareZero" icon="microchip">
+    Waveshare RP2040-Zero. A stamp-sized RP2040 board.
+  </Card>
+</CardGroup>
+
+## Breakout boards
+
+Purpose-built breakout boards that expose all GPIO pins via connectors or screw terminals for straightforward assembly of arcade sticks and fight pads.
+
+<CardGroup cols={2}>
+  <Card title="RP2040AdvancedBreakoutBoard" icon="circuit-board">
+    RP2040 Advanced Breakout Board by the OpenStick community. Provides labeled screw terminals for all button inputs, an I2C display header (GPIO 0/1), and an onboard RGB LED header (GPIO 4). Full 20-button layout supported.
+  </Card>
+  <Card title="RP2040AdvancedBreakoutBoardUSBPassthrough" icon="circuit-board">
+    USB passthrough variant of the RP2040 Advanced Breakout Board. Adds a secondary USB port for passthrough authentication with PS4/PS5.
+  </Card>
+  <Card title="RP2040MiniBreakoutBoard" icon="circuit-board">
+    Compact version of the RP2040 Advanced Breakout Board for smaller enclosures.
+  </Card>
+  <Card title="RP2040MiniBreakoutBoardUSBPassthrough" icon="circuit-board">
+    USB passthrough variant of the RP2040 Mini Breakout Board.
+  </Card>
+  <Card title="PicoFightingBoard" icon="circuit-board">
+    Pico Fighting Board. A community-designed breakout board using the Raspberry Pi Pico module.
+  </Card>
+  <Card title="PicoAnn" icon="circuit-board">
+    PicoAnn. A breakout board built around the Raspberry Pi Pico.
+  </Card>
+</CardGroup>
+
+## Flatbox series
+
+The Flatbox is a slim, low-profile all-button controller designed by [jfedor2](https://github.com/jfedor2). Multiple revisions and variants are supported.
+
+<CardGroup cols={2}>
+  <Card title="FlatboxRev4" icon="gamepad-2">
+    Flatbox revision 4.
+  </Card>
+  <Card title="FlatboxRev5" icon="gamepad-2">
+    Flatbox revision 5. Uses an RP2040-Zero module. 18-button layout across GPIO 2–15 and GPIO 26–29.
+  </Card>
+  <Card title="FlatboxRev5RGB" icon="gamepad-2">
+    Flatbox revision 5 with per-button RGB LEDs.
+  </Card>
+  <Card title="FlatboxRev5Southpaw" icon="gamepad-2">
+    Flatbox revision 5 in a southpaw (mirrored) layout.
+  </Card>
+  <Card title="FlatboxRev5USBPassthrough" icon="gamepad-2">
+    Flatbox revision 5 with USB passthrough for PS4/PS5 authentication.
+  </Card>
+  <Card title="FlatboxRev8" icon="gamepad-2">
+    Flatbox revision 8. The latest revision of the Flatbox design.
+  </Card>
+</CardGroup>
+
+## OpenCore series
+
+The Open_Core0 and its variants are officially supported controllers produced by the OpenStick Community.
+
+<CardGroup cols={2}>
+  <Card title="OpenCore0" icon="joystick">
+    Open_Core0. Features per-button RGB LEDs, an I2C display header, a USB peripheral port for passthrough, SOCD slider switches, and a dedicated function button. GPIO 0/1 for I2C display; GPIO 8 for RGB data.
+  </Card>
+  <Card title="OpenCore0MIXUP" icon="joystick">
+    Open_Core0 MIXUP variant.
+  </Card>
+  <Card title="OpenCore0WASD" icon="joystick">
+    Open_Core0 WASD variant with a directional layout suited to keyboard-style play.
+  </Card>
+</CardGroup>
+
+## Haute42 series
+
+The Haute42 COSMOX line are all-button controllers targeting tournament-level play.
+
+<CardGroup cols={2}>
+  <Card title="Haute42COSMOX" icon="joystick">
+    Haute42 COSMOX.
+  </Card>
+  <Card title="Haute42COSMOXCAT" icon="joystick">
+    Haute42 COSMOX CAT edition.
+  </Card>
+  <Card title="Haute42COSMOXMLite" icon="joystick">
+    Haute42 COSMOX M Lite. A smaller form-factor variant.
+  </Card>
+  <Card title="Haute42COSMOXMUltra" icon="joystick">
+    Haute42 COSMOX M Ultra.
+  </Card>
+  <Card title="Haute42COSMOXXAnalog" icon="joystick">
+    Haute42 COSMOX with analog stick support.
+  </Card>
+</CardGroup>
+
+## Mavercade series
+
+<CardGroup cols={2}>
+  <Card title="MavercadeRev1" icon="joystick">
+    Mavercade revision 1.
+  </Card>
+  <Card title="MavercadeRev2" icon="joystick">
+    Mavercade revision 2.
+  </Card>
+  <Card title="MavercadeRev3" icon="joystick">
+    Mavercade revision 3.
+  </Card>
+</CardGroup>
+
+## Reflex controllers
+
+The Reflex family provides adapters and encoders for classic console controllers.
+
+<CardGroup cols={2}>
+  <Card title="ReflexCtrlGenesis6" icon="gamepad-2">
+    Reflex controller adapter for Sega Genesis / Mega Drive 6-button pads.
+  </Card>
+  <Card title="ReflexCtrlNES" icon="gamepad-2">
+    Reflex controller adapter for NES / Famicom pads.
+  </Card>
+  <Card title="ReflexCtrlSaturn" icon="gamepad-2">
+    Reflex controller adapter for Sega Saturn pads.
+  </Card>
+  <Card title="ReflexCtrlSNES" icon="gamepad-2">
+    Reflex controller adapter for SNES / Super Famicom pads.
+  </Card>
+  <Card title="ReflexCtrlVB" icon="gamepad-2">
+    Reflex controller adapter for Nintendo Virtual Boy pads.
+  </Card>
+  <Card title="ReflexEncodeV1.2" icon="gamepad-2">
+    Reflex Encoder v1.2. A general-purpose encoder board.
+  </Card>
+  <Card title="ReflexEncodeV2.0" icon="gamepad-2">
+    Reflex Encoder v2.0. An updated revision of the Reflex Encoder.
+  </Card>
+</CardGroup>
+
+## Arcade devices
+
+Pre-built arcade sticks, control panels, and dedicated arcade hardware.
+
+<CardGroup cols={2}>
+  <Card title="ARCController" icon="joystick">
+    ARC Controller.
+  </Card>
+  <Card title="BentoBox" icon="joystick">
+    Bento Box controller.
+  </Card>
+  <Card title="MiSTercadeV2" icon="joystick">
+    MiSTercade V2. Designed for use with the MiSTer FPGA platform.
+  </Card>
+  <Card title="SGFDevices" icon="joystick">
+    SGF Devices controller.
+  </Card>
+  <Card title="PXPGamepad" icon="joystick">
+    PXP Gamepad.
+  </Card>
+  <Card title="OSUMGP-RP2040" icon="joystick">
+    OSU MGP RP2040. An RP2040-based gamepad for osu! and similar rhythm games.
+  </Card>
+</CardGroup>
+
+## Specialty boards
+
+<CardGroup cols={2}>
+  <Card title="ASiLVLABC" icon="gamepad-2">
+    ASiLVL ABC layout.
+  </Card>
+  <Card title="ASiLVLWASD" icon="gamepad-2">
+    ASiLVL WASD layout.
+  </Card>
+  <Card title="Granola" icon="gamepad-2">
+    Granola board.
+  </Card>
+  <Card title="GranolaBeacon" icon="gamepad-2">
+    Granola Beacon. A wireless-capable variant of the Granola board.
+  </Card>
+  <Card title="ZeroRhythm" icon="gamepad-2">
+    ZeroRhythm. A rhythm game controller.
+  </Card>
+  <Card title="KeyboardConverter" icon="keyboard">
+    Keyboard Converter. Allows a USB keyboard to be used as a gamepad input device.
+  </Card>
+  <Card title="Stress" icon="cpu">
+    Stress test build. Used for development and hardware validation purposes only.
+  </Card>
+</CardGroup>
+
+## Blank / generic
+
+<CardGroup cols={2}>
+  <Card title="Blank" icon="square">
+    A bare configuration with no pre-assigned GPIO pins. Use this as a starting point when creating a custom board configuration from scratch.
+  </Card>
+</CardGroup>

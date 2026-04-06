@@ -1,0 +1,200 @@
+---
+title: 'Display configuration'
+description: 'Configure an I2C OLED display for GP2040-CE. Set button layouts, orientation, splash screen, display saver, contrast, and status indicators.'
+---
+
+GP2040-CE supports a monochrome 128×64 OLED display connected via I2C. The display shows real-time status information, button input visualization, and a splash screen at boot.
+
+<Info>
+  The display configuration page is only available when an I2C peripheral block is enabled in the **Peripheral Mapping** page. If I2C is not configured, the page shows a link to the Peripheral Mapping page instead.
+</Info>
+
+## Supported hardware
+
+- Monochrome 128×64 pixel display
+- Compatible ICs: SSD1306, SH1106, SH1107, and other compatible controllers
+- Operates at 3.3V
+- Communicates over I2C (SDA and SCL pins configured in Peripheral Mapping)
+
+The I2C address and speed are configured in **Peripheral Mapping**, not on this page.
+
+---
+
+## Hardware tab
+
+### Enable display
+
+Enables or disables the OLED display entirely. When disabled, no signals are sent over I2C to the display.
+
+---
+
+## Screen tab
+
+### Flip / rotate display
+
+Controls the physical orientation of the display:
+
+| Mode | Value | Description |
+|---|---|---|
+| None | 0 | Normal orientation |
+| Flip | 1 | Rotated 180° (flipped vertically) |
+| Mirror | 2 | Mirrored horizontally |
+| Flip + Mirror | 3 | Rotated 180° and mirrored |
+
+Use this if your display is mounted upside-down or facing a mirrored surface.
+
+### Invert display
+
+Inverts all pixels on the display (white becomes black and vice versa). Toggle to match your display's intended appearance or for visibility in different lighting conditions.
+
+### Display contrast
+
+A slider from 38 to 255 (displayed as a percentage) that adjusts the OLED panel's contrast level. Higher values increase the brightness of lit pixels. The default is 255 (100%).
+
+### Turn off when suspended
+
+When enabled, the display powers off while the host system is suspended (sleeping). The display turns back on when the host resumes.
+
+---
+
+## Layout tab
+
+### Button layout (left side)
+
+Selects the visual layout template for the left side of the button display. Available layouts include:
+
+<AccordionGroup>
+  <Accordion title="Available left-side layouts">
+    | Layout | Description |
+    |---|---|
+    | Stick | Traditional joystick layout |
+    | Stickless | Leverless / hitbox-style layout |
+    | Buttons Angled | Angled button arrangement |
+    | Buttons Basic | Simple button grid |
+    | Keyboard Angled | Angled keyboard-style layout |
+    | Keyboard A | Keyboard layout variant A |
+    | Dance Pad A | Dance pad layout |
+    | Twin Stick A | Dual joystick layout |
+    | Blank A | Empty (no buttons drawn) |
+    | VLX A | VLX-style layout |
+    | Fightboard Stick | Fightboard with stick |
+    | Fightboard Mirrored | Fightboard mirrored |
+    | Custom A | Fully custom layout (configure with custom options) |
+    | OpenCore0 WASD | WASD-style layout |
+    | Stickless 13 / 16 / 14 | Stickless variants |
+    | Dance Pad DDR / PIU | DDR and PIU dance pad layouts |
+    | Pop'n A, Taiko A, BM Turntable A | Rhythm game layouts |
+    | BM 5Key / 7Key A | Beatmania key layouts |
+    | Gitadora Fret / Strum A | Gitadora layouts |
+    | Band Hero Fret / Strum A | Band Hero layouts |
+    | 6GAWD variants | 6-button layouts |
+    | Board Defined A / Alt 0–7 | Layouts defined by the board configuration |
+  </Accordion>
+</AccordionGroup>
+
+### Button layout (right side)
+
+Selects the visual layout for the right side of the button display. Available layouts include Arcade, Vewlix, Capcom, Sega 2P, Noir8, and many others corresponding to common arcade panel arrangements.
+
+### Button layout orientation
+
+Controls how left and right button layouts are positioned relative to each other:
+
+| Orientation | Value | Description |
+|---|---|---|
+| Standard | 0 | Left layout on the left, right layout on the right |
+| Southpaw | 1 | Left and right swapped for left-handed layout |
+| Switched | 2 | Layouts switched |
+
+### Custom layout options
+
+When the **Custom A** (left) or **Custom B** (right) layout is selected, additional parameters appear for each side:
+
+| Parameter | Range | Description |
+|---|---|---|
+| Layout | — | Base layout template to start from |
+| Start X | 0–128 | Horizontal offset of the layout origin |
+| Start Y | 0–64 | Vertical offset of the layout origin |
+| Button Radius | 0–20 | Radius of each button circle in pixels |
+| Button Padding | 0–20 | Spacing between buttons in pixels |
+
+### Status indicators
+
+Toggle which status items appear in the display header area:
+
+| Indicator | Default | Description |
+|---|---|---|
+| Input Mode | On | Shows the active input mode (XInput, PS4, etc.) |
+| Turbo Mode | On | Shows turbo status |
+| D-pad Mode | On | Shows current D-pad mode (Digital, LS, RS) |
+| SOCD Mode | On | Shows active SOCD cleaning mode |
+| Macro Mode | On | Shows macro active state |
+| Profile Mode | Off | Shows the active profile name |
+
+### Input history
+
+Displays a scrolling history of recent button inputs on the OLED. Useful for demonstrating inputs during streams or reviewing combo execution.
+
+| Setting | Range | Description |
+|---|---|---|
+| Input History Enabled | — | Toggle to show or hide input history |
+| History Length | 1–21 | Number of recent inputs to display |
+| Column position | 0–20 | Horizontal position of the history display |
+| Row position | 0–7 | Vertical row position of the history display |
+
+---
+
+## Mode tab
+
+### Splash screen
+
+The splash screen is displayed briefly when the device boots before showing the button layout.
+
+| Mode | Value | Description |
+|---|---|---|
+| Enabled (Static) | 0 | Show a static splash image at boot |
+| Disabled | 3 | Skip the splash screen entirely |
+
+### Splash duration
+
+How long the splash screen is displayed, in milliseconds. Set to `0` to show the splash indefinitely until a button is pressed.
+
+### Custom splash image
+
+Upload a custom 128×64 monochrome image to use as the boot splash screen. The image is converted to black and white (any pixel with average brightness above 123 is set to white).
+
+<Steps>
+  <Step title="Upload an image">
+    Click the file input to select a JPEG or PNG image from your computer. Any size is accepted; the image is scaled to fit 128×64 while preserving aspect ratio.
+  </Step>
+  <Step title="Invert if needed">
+    Check the **Invert** checkbox to flip the image colors (swap black and white pixels).
+  </Step>
+  <Step title="Save">
+    Click **Save** to store the converted bitmap on the device.
+  </Step>
+</Steps>
+
+---
+
+## Display saver
+
+The display saver activates after a configurable period of inactivity to prevent OLED burn-in.
+
+### Display saver mode
+
+| Mode | Value | Description |
+|---|---|---|
+| Display Off | 0 | Turn the display completely off |
+| Snow | 1 | Random noise pattern |
+| Bounce | 2 | A bouncing element |
+| Pipes | 3 | Pipes-style screensaver |
+| Toast | 4 | Toast notification style animation |
+
+### Display saver timeout
+
+The number of seconds of inactivity before the display saver activates. Set to `0` to disable the display saver.
+
+<Tip>
+  Use **Display Off** mode to maximize OLED panel lifespan. The display reactivates immediately when a button is pressed.
+</Tip>

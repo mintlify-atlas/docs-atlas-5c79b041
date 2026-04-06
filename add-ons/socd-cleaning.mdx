@@ -1,0 +1,77 @@
+---
+title: SOCD cleaning
+description: The SOCD Slider add-on uses physical GPIO pins as a hardware switch to change the active SOCD cleaning mode on the fly, overriding the device's global SOCD setting.
+---
+
+Simultaneous Opposite Cardinal Directions (SOCD) occurs when a player presses two opposing directional inputs (e.g., Left + Right or Up + Down) at the same time. GP2040-CE resolves this conflict using one of five SOCD modes. The **SOCD Slider** add-on lets you change the active mode in real time using a physical switch wired to GPIO pins, without touching the web configurator.
+
+## SOCD modes
+
+The following modes are available, sourced from the `SOCDMode` enum in the firmware:
+
+| Mode | Identifier | Behavior |
+|------|-----------|----------|
+| **Up Priority** | `SOCD_MODE_UP_PRIORITY` | U+D = Up, L+R = Neutral |
+| **Neutral** | `SOCD_MODE_NEUTRAL` | U+D = Neutral, L+R = Neutral |
+| **Second Input Priority** | `SOCD_MODE_SECOND_INPUT_PRIORITY` | The last-pressed direction wins |
+| **First Input Priority** | `SOCD_MODE_FIRST_INPUT_PRIORITY` | The first-pressed direction wins |
+| **Bypass** | `SOCD_MODE_BYPASS` | Both directions are reported simultaneously with no cleaning |
+
+<Warning>
+  SOCD Bypass sends simultaneous opposing inputs to the host. Some games and tournaments prohibit this. Check tournament rules before using Bypass mode.
+</Warning>
+
+## SOCD Slider vs. the global SOCD setting
+
+The global SOCD mode is set under **Settings** in the web configurator and applies to the device at all times. The SOCD Slider add-on **overrides** the global mode whenever a slider pin is held. When no slider pin is active, the add-on falls back to the **Default Mode** configured in the add-on settings.
+
+## Hardware slider configuration
+
+The SOCD Slider uses the pin mapping system. Assign any GPIO pins to the following `GpioAction` values in **Pin Mapping**:
+
+| GpioAction | SOCD mode activated when pin is held |
+|------------|-------------------------------------|
+| `SUSTAIN_SOCD_MODE_UP_PRIO` | Up Priority |
+| `SUSTAIN_SOCD_MODE_NEUTRAL` | Neutral |
+| `SUSTAIN_SOCD_MODE_SECOND_WIN` | Second Input Priority |
+| `SUSTAIN_SOCD_MODE_FIRST_WIN` | First Input Priority |
+| `SUSTAIN_SOCD_MODE_BYPASS` | Bypass |
+
+Multiple pins with different SOCD actions can be wired to a physical multi-position slider switch. Only one pin will be active at any time depending on the switch position.
+
+The firmware reads active pins in the order listed above and uses the first match. If no pin is active, the **Default Mode** setting applies.
+
+## Configuration options
+
+| Field | Description |
+|-------|-------------|
+| **Enabled** | Enables the SOCD Slider add-on |
+| **Default Mode** | SOCD mode to use when no slider pin is held |
+
+## Setup procedure
+
+<Steps>
+  <Step title="Wire the slider">
+    Connect a physical slider or toggle switch so that each position connects a different GPIO pin to ground. Use pull-up inputs—the pin reads as active when pulled low.
+  </Step>
+  <Step title="Assign pins in Pin Mapping">
+    In the web configurator, go to **Pin Mapping** and assign each GPIO pin connected to the slider to the appropriate `SUSTAIN_SOCD_MODE_*` action.
+  </Step>
+  <Step title="Enable the add-on">
+    Go to **Add-ons Config** and enable **SOCD Cleaning Mode Selection Slider**.
+  </Step>
+  <Step title="Set the default mode">
+    Choose the SOCD mode to use when the slider is in the center or unconnected position.
+  </Step>
+  <Step title="Save">
+    Click **Save**. Move the slider to verify that the SOCD mode changes as expected.
+  </Step>
+</Steps>
+
+<Info>
+  The SOCD Slider add-on reads pin state every processing loop. Mode changes take effect within one frame (typically under 1 ms) of moving the slider.
+</Info>
+
+## Dual Directional Input SOCD
+
+If you use the Dual Directional Input (DDI) add-on alongside SOCD Slider, note that DDI has its own independent SOCD mode setting (`tiltSOCDMode` in TiltOptions). The SOCD Slider only affects the primary directional input, not the DDI input channel.

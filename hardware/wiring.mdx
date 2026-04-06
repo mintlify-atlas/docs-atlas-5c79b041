@@ -1,0 +1,129 @@
+---
+title: Wiring
+description: How to wire buttons, displays, RGB LEDs, and analog joysticks to an RP2040-based board running GP2040-CE.
+---
+
+This page covers wiring GPIO-based inputs and common add-on hardware to an RP2040 board. The examples use the Raspberry Pi Pico as the reference board. Pin numbers will differ for other boards — always consult your specific board's `BoardConfig.h` or README for the authoritative pin mapping.
+
+<Warning>
+  The RP2040 operates at **3.3 V logic**. Most GPIO pins are **not 5 V tolerant**. Connecting 5 V signals directly to GPIO pins will permanently damage the chip. Use level shifters where required.
+</Warning>
+
+## RP2040 GPIO overview
+
+The RP2040 exposes up to 30 GPIO pins (GPIO 0–29), though not all are available on every board:
+
+- **GPIO 0–28**: General-purpose digital I/O. Can be configured as input (with optional internal pull-up or pull-down) or output.
+- **GPIO 26–29**: Also connected to the on-chip ADC (12-bit, four channels). Use these pins for analog inputs such as joystick axes.
+- **GPIO 23–25**: Reserved for internal Pico functions on the standard Pico board (SMPS control, VBUS sense, onboard LED). Avoid using these for button inputs on Pico builds.
+
+The RP2040 has internal pull-up resistors on all GPIO pins. GP2040-CE enables them by default, so **no external pull-up resistors are required** for digital button inputs.
+
+## Button wiring
+
+Buttons are wired in an **active-low** configuration: one leg of the button connects to a GPIO pin, the other leg connects to GND. When the button is pressed, it pulls the GPIO pin to GND, which the firmware reads as a button press.
+
+```
+GPIO pin ──┬──[ internal pull-up ]── 3.3V
+           │
+          [button]
+           │
+          GND
+```
+
+**In practice:**
+
+- Connect one side of the button to the GPIO pin assigned to the action you want (e.g., GPIO 6 for B1/Cross/A on a Pico build).
+- Connect the other side of the button to any GND pin on the board.
+
+The Raspberry Pi Pico has **eight GND pins** distributed around its perimeter, making it easy to share a GND bus.
+
+<Tip>
+  Use a multimeter in continuity mode to verify each connection before powering the board. Check that each button shows continuity between its two solder points, and that no GPIO pin is shorted to another.
+</Tip>
+
+### Pico default pin mapping
+
+The table below shows the default GP2040-CE button assignments for the Raspberry Pi Pico build. Each GPIO connects directly to a button; the other side of every button goes to GND.
+
+| GPIO pin | GP2040-CE action | XInput   | Switch  | PS3/4/5  | Arcade |
+|----------|-----------------|----------|---------|----------|--------|
+| GPIO 2   | UP              | UP       | UP      | UP       | UP     |
+| GPIO 3   | DOWN            | DOWN     | DOWN    | DOWN     | DOWN   |
+| GPIO 4   | RIGHT           | RIGHT    | RIGHT   | RIGHT    | RIGHT  |
+| GPIO 5   | LEFT            | LEFT     | LEFT    | LEFT     | LEFT   |
+| GPIO 6   | B1              | A        | B       | Cross    | K1     |
+| GPIO 7   | B2              | B        | A       | Circle   | K2     |
+| GPIO 8   | R2              | RT       | ZR      | R2       | K3     |
+| GPIO 9   | L2              | LT       | ZL      | L2       | K4     |
+| GPIO 10  | B3              | X        | Y       | Square   | P1     |
+| GPIO 11  | B4              | Y        | X       | Triangle | P2     |
+| GPIO 12  | R1              | RB       | R       | R1       | P3     |
+| GPIO 13  | L1              | LB       | L       | L1       | P4     |
+| GPIO 14  | Turbo           | —        | —       | —        | —      |
+| GPIO 16  | S1              | Back     | Minus   | Select   | Coin   |
+| GPIO 17  | S2              | Start    | Plus    | Start    | Start  |
+| GPIO 18  | L3              | LS       | LS      | L3       | LS     |
+| GPIO 19  | R3              | RS       | RS      | R3       | RS     |
+| GPIO 20  | A1              | Guide    | Home    | PS       | —      |
+| GPIO 21  | A2              | —        | Capture | —        | —      |
+
+## OLED display wiring (I2C)
+
+GP2040-CE supports 128×64 monochrome I2C displays: SSD1306, SH1106, and SH1107. These use a four-wire I2C connection.
+
+| Display pin | Pico pin        | Notes                              |
+|-------------|----------------|------------------------------------|
+| VCC         | 3.3V (pin 36)  | Do not connect to 5V               |
+| GND         | GND            | Any GND pin                        |
+| SDA         | GPIO 0 (pin 1) | I2C0 SDA (default Pico config)     |
+| SCL         | GPIO 1 (pin 2) | I2C0 SCL (default Pico config)     |
+
+<Note>
+  The default I2C address for most SSD1306 displays is `0x3C`. If you have two I2C devices sharing the same bus, verify that their addresses do not conflict. The address is usually configurable via a solder bridge on the display module.
+</Note>
+
+Most display modules include pull-up resistors on SDA and SCL. If you are experiencing I2C issues, verify the pull-up resistors are present; 4.7 kΩ to 3.3 V is a common value.
+
+## RGB LED strip wiring (WS2812B)
+
+Per-button addressable RGB LEDs use a single-wire data protocol. The data pin is defined by `BOARD_LEDS_PIN` in the board config (GPIO 28 on the default Pico build).
+
+| LED strip pin | Connection           | Notes                                                        |
+|--------------|----------------------|--------------------------------------------------------------|
+| DIN (data)   | GPIO 28 (Pico)       | Use a 300–500 Ω series resistor close to the data pin       |
+| VCC (5V)     | External 5V supply   | Do not power WS2812B LEDs from Pico's 3.3V rail             |
+| GND          | GND (shared)         | Common GND between Pico and LED power supply                 |
+
+<Warning>
+  WS2812B LEDs require a **5 V data signal** for reliable operation, but the Pico outputs 3.3 V logic. In practice, many WS2812B strips will work at 3.3 V with a short wire run, but a **logic level shifter** (e.g., 74AHCT125 or SN74LVC1T45) between the Pico data pin and the LED strip is recommended for reliable operation, especially with more than a handful of LEDs or a longer cable run.
+</Warning>
+
+The default LED format for Pico builds is `GRB`. If your LED strip shows incorrect colors, check whether your strip uses `RGB` or `GRB` byte order and adjust the setting in the web configurator.
+
+## Analog joystick wiring
+
+Analog thumbsticks output two analog voltages (one per axis). Connect them to the RP2040's ADC-capable pins (GPIO 26–29).
+
+| Joystick pin | Connection       | Notes                                      |
+|-------------|------------------|--------------------------------------------|
+| VCC         | 3.3V             | Use 3.3V, not 5V — the ADC input max is 3.3V |
+| GND         | GND              | Any GND pin                                |
+| X axis      | GPIO 26 (ADC 0)  | Outputs 0–3.3V depending on position       |
+| Y axis      | GPIO 27 (ADC 1)  | Outputs 0–3.3V depending on position       |
+
+<Warning>
+  The RP2040 ADC inputs have a **maximum voltage of 3.3 V**. Never connect joystick VCC to 5 V — the wiper output will exceed the ADC's input range and will damage the chip.
+</Warning>
+
+After wiring, enable and configure the analog joystick add-on in the web configurator, selecting the correct ADC pins for each axis.
+
+## USB host / peripheral wiring
+
+Some boards (such as the OpenCore0 and the USB Passthrough variants) include a dedicated USB peripheral port for passthrough authentication with PS4 and PS5. On these boards the USB D+ and D− lines are routed to specific GPIO pins (e.g., GPIO 28 on the OpenCore0) and handled by the firmware's USB peripheral add-on.
+
+If you are adding a USB host port to a bare Pico or breakout board, the D+ and D− signals must be routed through a USB connector or cable breakout and connected to the appropriate GPIO pins configured in the USB Peripheral add-on settings. A 27 Ω series resistor on each data line and a 1.5 kΩ pull-up on D+ are standard for a full-speed USB device.
+
+<Note>
+  Consult the USB Peripheral add-on documentation and your board's schematic before attempting to add a USB passthrough port to a custom build. Incorrect wiring can damage connected devices.
+</Note>

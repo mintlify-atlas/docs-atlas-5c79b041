@@ -1,0 +1,116 @@
+---
+title: Input macros
+description: The Input Macros add-on plays back automated button sequences triggered by a single button press, enabling combos, rapid sequences, and accessibility features.
+---
+
+Input macros let you record sequences of button inputs and replay them automatically when a trigger button is pressed. Each macro executes its steps in order, holding each input for a configurable duration before moving to the next. Macros are useful for fighting game combos, sequences that require precise timing, or accessibility use cases where multi-button combinations are difficult to execute manually.
+
+## Limits
+
+| Property | Limit |
+|----------|-------|
+| Maximum number of macros | 6 |
+| Maximum inputs per macro | 30 |
+| Default input hold time | ~16.67 ms (one frame at 60 Hz) |
+
+## Trigger types
+
+Each macro has a **macro type** that controls when and how it runs:
+
+| Type | `MacroType` value | Behavior |
+|------|------------------|----------|
+| **On Press** | `ON_PRESS` | Runs the full macro sequence once when the trigger is first pressed. Releasing and re-pressing replays it. |
+| **On Hold Repeat** | `ON_HOLD_REPEAT` | Runs the macro sequence in a loop for as long as the trigger is held. Releasing stops the macro immediately. |
+| **On Toggle** | `ON_TOGGLE` | First press starts the macro (runs in a loop). Second press stops it. The macro continues to run even after releasing the trigger button. |
+
+## Trigger method
+
+Each macro can be triggered in one of two ways:
+
+<Tabs>
+  <Tab title="Pin trigger">
+    A dedicated GPIO pin is assigned to a specific macro slot in **Pin Mapping** using the actions `BUTTON_PRESS_MACRO_1` through `BUTTON_PRESS_MACRO_6`. Pressing the physical button on that pin fires the corresponding macro directly.
+  </Tab>
+  <Tab title="Trigger button + macro pin">
+    A GPIO pin is assigned `BUTTON_PRESS_MACRO` (the macro mode pin). A gamepad button is designated as the macro trigger for each individual macro. When the macro mode pin is held and the trigger button is pressed, the macro fires.
+  </Tab>
+</Tabs>
+
+## Macro inputs
+
+Each step in a macro is a `MacroInput` with three properties:
+
+| Property | Description |
+|----------|-------------|
+| **Button Mask** | Bitmask of buttons and D-pad directions to press during this step |
+| **Duration** | How long (in microseconds) to hold the buttons before advancing |
+| **Wait Duration** | How long (in microseconds) to wait with all buttons released after this step |
+
+If both `duration` and `waitDuration` are zero, the step uses the default hold time of approximately 16.67 ms.
+
+## Macro options
+
+Each macro also has two behavior flags:
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| **Exclusive** | Enabled | While the macro runs, all other button input is suppressed |
+| **Interruptible** | Enabled | If the player presses any button while the macro runs, the macro stops |
+
+When both flags are enabled (default), player input cancels the macro. When `exclusive = true` and `interruptible = false`, the macro runs to completion and blocks all other input during that time.
+
+## Use cases
+
+<AccordionGroup>
+  <Accordion title="Fighting game combos">
+    Record a sequence of attack buttons with frame-precise durations to execute combos reliably without manual execution. Use On Press type to fire once per trigger press.
+  </Accordion>
+  <Accordion title="Rapid input sequences">
+    Use On Hold Repeat to loop a sequence of inputs while a button is held — useful for rhythm games or any situation requiring sustained repeated inputs.
+  </Accordion>
+  <Accordion title="Accessibility">
+    Map complex multi-button combinations to a single dedicated macro pin. Use On Toggle to run the macro hands-free once started.
+  </Accordion>
+</AccordionGroup>
+
+## Creating a macro
+
+<Steps>
+  <Step title="Enable the add-on">
+    In the web configurator, go to **Add-ons Config** and verify the macro add-on is available. The add-on is active whenever at least one GPIO pin is assigned a macro action in **Pin Mapping**.
+  </Step>
+  <Step title="Assign macro pins">
+    In **Pin Mapping**, assign one or more GPIO pins to `BUTTON_PRESS_MACRO_1` through `BUTTON_PRESS_MACRO_6`, or assign a pin to `BUTTON_PRESS_MACRO` for the shared macro mode pin.
+  </Step>
+  <Step title="Open the macro editor">
+    Navigate to **Macros** in the web configurator. Each macro slot (1–6) has an independent configuration panel.
+  </Step>
+  <Step title="Configure the macro">
+    For each macro you want to use:
+    - Enter a **label** for identification.
+    - Select the **macro type** (On Press, On Hold Repeat, or On Toggle).
+    - If using a trigger button, enable **Use Macro Trigger Button** and select the button.
+    - Set the **Exclusive** and **Interruptible** flags.
+  </Step>
+  <Step title="Add inputs">
+    Click **Add Input** to append a step. For each step:
+    - Select the buttons and/or D-pad directions to press.
+    - Set the **duration** in microseconds (e.g., 16667 for one 60 Hz frame).
+    - Optionally set a **wait duration** to pause between steps.
+  </Step>
+  <Step title="Save">
+    Click **Save**. Test the macro by pressing its trigger pin or trigger button combination.
+  </Step>
+</Steps>
+
+<Tip>
+  Leave duration at 0 to use the default one-frame hold time (~16.67 ms). Explicitly set durations in microseconds when you need frame-precise control.
+</Tip>
+
+<Note>
+  The Input Macros add-on runs during the `preprocess` phase, before input is sent to the host. Macro inputs are injected directly into the gamepad button state, so they appear identical to physical button presses.
+</Note>
+
+## Focus mode interaction
+
+If the **Focus Mode** add-on is enabled with **Macro Lock** active, macros are suppressed while focus mode is engaged (unless the override flag is set in Focus Mode options).

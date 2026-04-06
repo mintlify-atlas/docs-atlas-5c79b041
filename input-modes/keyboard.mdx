@@ -1,0 +1,112 @@
+---
+title: 'Keyboard mode'
+description: 'Keyboard and Generic HID input modes in GP2040-CE. Covers key mapping configuration, mouse movement modes, use cases, and the difference from Generic HID mode.'
+---
+
+Keyboard mode (`INPUT_MODE_KEYBOARD`, value 3) causes the controller to enumerate as a standard USB HID keyboard. Every button and D-pad direction can be mapped to any keyboard key, including modifier keys and multimedia keys.
+
+<Note>
+Keyboard mode only works on hosts that accept USB HID keyboards — primarily PCs. It does not work on PS4, PS5, Nintendo Switch, or Xbox consoles.
+</Note>
+
+## Use cases
+
+<CardGroup cols={2}>
+  <Card title="PC games without gamepad support" icon="desktop">
+    Many older PC games and emulators accept keyboard input but not gamepads. Keyboard mode lets you use your controller layout directly.
+  </Card>
+  <Card title="Fighting games via keyboard" icon="keyboard">
+    Some players prefer keyboard-style inputs for fighting games on PC. Keyboard mode lets a leverless or hitbox-style controller present as a keyboard.
+  </Card>
+  <Card title="Emulator compatibility" icon="gamepad">
+    Emulators that map keyboard keys to emulated console buttons work directly without any additional gamepad-to-keyboard mapping layer.
+  </Card>
+  <Card title="Accessibility" icon="hand">
+    Adaptive controllers and accessibility setups that rely on keyboard HID profiles benefit from the flexible key mapping.
+  </Card>
+</CardGroup>
+
+<Tip>
+Keyboard mode is particularly useful with emulators. Configure your emulator's keyboard bindings to match the keys assigned to your controller buttons, and you get low-latency input without needing a virtual gamepad driver.
+</Tip>
+
+## Activating keyboard mode
+
+<Steps>
+  <Step title="Set via web configurator">
+    Open the GP2040-CE web configurator, go to **Settings → Input Mode**, and select **Keyboard**. Save and reboot.
+  </Step>
+  <Step title="Or assign a boot hotkey">
+    In **Settings → Boot Input Mode**, assign **Keyboard** to a button (e.g. B4). Hold that button while plugging in to start in keyboard mode.
+  </Step>
+</Steps>
+
+## Key mapping
+
+Every mappable input has an independently configurable key. Mappable inputs include:
+
+- D-pad directions (Up, Down, Left, Right)
+- Face buttons: B1, B2, B3, B4
+- Shoulder and trigger buttons: L1, R1, L2, R2
+- Center buttons: S1, S2
+- Auxiliary buttons: A1, A2, A3, A4
+- Extra buttons: E1–E12
+
+Keys are configured in the web configurator under **Settings → Keyboard Mapping**. The KeyboardMapper component displays all mappable buttons and lets you assign any HID key code to each one.
+
+### Supported key types
+
+| Key type | Examples |
+|---|---|
+| Standard HID key codes | Letters (A–Z), numbers (0–9), function keys (F1–F12), punctuation |
+| Modifier keys | Left Ctrl, Left Shift, Left Alt, Left GUI, Right Ctrl, Right Shift, Right Alt, Right GUI |
+| Multimedia keys | Next Track, Previous Track, Stop, Play/Pause, Mute, Volume Up, Volume Down |
+
+Modifier keys are handled separately from standard keys — they are reported in the HID modifier byte rather than the keycode array.
+
+## Mouse movement mode
+
+The analog sticks can optionally control mouse cursor movement. This is configured via the `MouseMovementMode` enum:
+
+| Mode | Value | Description |
+|---|---|---|
+| `MOUSE_MOVEMENT_NONE` | 0 | No mouse movement (default) |
+| `MOUSE_MOVEMENT_LEFT_ANALOG` | 1 | Left stick controls mouse cursor |
+| `MOUSE_MOVEMENT_RIGHT_ANALOG` | 2 | Right stick controls mouse cursor |
+
+<Info>
+Mouse movement mode is configured separately from keyboard key mapping. It is intended for setups where one stick drives the mouse cursor while the buttons and D-pad send keystrokes.
+</Info>
+
+## Multimedia key support
+
+If a rotary encoder add-on is configured for volume control, the keyboard driver translates encoder events into Volume Up and Volume Down multimedia key presses. These are reported in a separate HID report ID from standard key codes.
+
+## How the keyboard HID report works
+
+The keyboard driver sends two types of HID reports:
+
+1. **Key report** (report ID `KEYBOARD_KEY_REPORT_ID`): A 224-bit bitmap of pressed HID key codes, plus a modifier byte.
+2. **Multimedia report** (report ID `KEYBOARD_MULTIMEDIA_REPORT_ID`): A single byte encoding one active multimedia function.
+
+Only one report type is active at a time. If a multimedia key is pressed, the multimedia report is sent instead of the key report.
+
+## Generic HID mode
+
+`INPUT_MODE_GENERIC` (value 14) is a standard USB HID gamepad profile. It is not a keyboard — it presents as a generic joystick/gamepad device that most operating systems recognize without drivers.
+
+Key differences from keyboard mode:
+
+| Feature | Keyboard mode | Generic HID |
+|---|---|---|
+| Appears as | USB keyboard | USB HID gamepad |
+| Button reporting | Key codes (keyboard scan codes) | Gamepad button bits |
+| Analog axes | Mouse movement (optional) | Joystick axes |
+| Console compatibility | PC only | PC only |
+| Custom USB descriptor | No | Yes (via USB override settings) |
+
+Generic HID mode supports the USB descriptor override feature, allowing you to set custom vendor ID, product ID, manufacturer string, and product name.
+
+<Note>
+Generic HID mode is useful when you need a simple gamepad profile on PC without the overhead of XInput or the complexity of PlayStation/Switch authentication. It works with any application that accepts DirectInput or standard HID gamepad devices.
+</Note>

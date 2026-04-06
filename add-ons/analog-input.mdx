@@ -1,0 +1,116 @@
+---
+title: Analog input
+description: The Analog Input add-on maps ADC-capable GPIO pins to left and right analog stick axes, with support for deadzone configuration, auto-calibration, and EMA smoothing.
+---
+
+The Analog Input add-on reads up to two pairs of analog joystick axes using the RP2040's built-in 12-bit ADC. Each pair of X/Y pins maps independently to either the left or right analog stick. The firmware reads raw ADC values, applies center calibration, radial deadzone scaling, optional EMA smoothing, and forced circularity before writing the result to the gamepad state.
+
+## ADC pin constraints
+
+The RP2040 has four ADC channels, exposed on GPIO pins 26–29:
+
+| GPIO pin | ADC channel |
+|----------|-------------|
+| GPIO 26  | ADC 0       |
+| GPIO 27  | ADC 1       |
+| GPIO 28  | ADC 2       |
+| GPIO 29  | ADC 3       |
+
+<Warning>
+  Only GPIO 26–29 can be used as ADC inputs. Assigning a non-ADC pin will produce no analog output. The web configurator filters the pin selector to show only available ADC pins.
+</Warning>
+
+## Configuration options
+
+The add-on supports two independent joystick pairs, labeled **ADC 1** and **ADC 2**. Each pair has the following options:
+
+### Pin assignment
+
+| Field | Description |
+|-------|-------------|
+| **X Axis Pin** | GPIO pin (26–29) for the horizontal axis |
+| **Y Axis Pin** | GPIO pin (26–29) for the vertical axis |
+
+### Stick mode
+
+Controls which analog stick the pair drives:
+
+| Value | Output |
+|-------|--------|
+| Left Analog | Left stick (LX / LY) |
+| Right Analog | Right stick (RX / RY) |
+
+ADC 1 defaults to Left Analog; ADC 2 defaults to Right Analog.
+
+### Invert mode
+
+Flips one or both axes before applying deadzone logic:
+
+| Value | Effect |
+|-------|--------|
+| None | No inversion |
+| X Axis | Inverts X |
+| Y Axis | Inverts Y |
+| X/Y Axis | Inverts both |
+
+### Deadzone
+
+Deadzone is applied as a radial (circular) region around the stick center. Values are expressed as a percentage of the full 12-bit ADC range (0–100).
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| **Inner Deadzone** | 5% | Input below this magnitude is snapped to center |
+| **Outer Deadzone** | 95% | Input above this magnitude is clamped to maximum |
+
+The firmware calculates the Euclidean magnitude of the X/Y pair and maps it through the inner-to-outer deadzone range using linear scaling.
+
+### Forced circularity
+
+When enabled, the stick output is constrained to a perfect circle (the scaling factor is clamped to 0.5 in normalized space), preventing the stick from reporting corner values outside the circular boundary. An **Error Rate** (0–15%) compensates for joystick mechanical tolerances when this mode is active.
+
+### Auto-calibration
+
+When enabled, the firmware reads the current ADC value on each axis at startup and uses it as the center reference. This automatically accounts for joystick drift without manual adjustment.
+
+When disabled, a **Manual Calibrate** button in the web configurator guides you through a four-corner calibration process (top-left, top-right, bottom-left, bottom-right). The averaged center value is stored as `joystick_center_x` / `joystick_center_y` in configuration.
+
+### EMA smoothing
+
+Exponential Moving Average (EMA) filtering reduces noise in the analog signal.
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| **Analog Smoothing** | Disabled | Toggle to enable EMA filtering |
+| **Smoothing Factor** | 5 | Higher values produce more smoothing (0–100) |
+
+The smoothing factor is divided by 1000 internally to produce the EMA alpha value.
+
+## Setup procedure
+
+<Steps>
+  <Step title="Wire the joystick">
+    Connect the VRX (X axis) and VRY (Y axis) potentiometer outputs to two of GPIO 26–29. Connect VCC and GND to the appropriate power rails.
+  </Step>
+  <Step title="Enable the add-on">
+    In the web configurator, go to **Add-ons Config** and enable **Analog Input**.
+  </Step>
+  <Step title="Assign pins">
+    Under the **ADC 1** tab, select the GPIO pin used for X and Y. Repeat for **ADC 2** if using a second joystick.
+  </Step>
+  <Step title="Choose stick mode">
+    Set **Analog Stick 1 Mode** to Left Analog or Right Analog, and set **Analog Stick 2 Mode** accordingly.
+  </Step>
+  <Step title="Configure deadzones">
+    Adjust the inner and outer deadzone percentages to match your joystick's physical characteristics. Default values (5% inner, 95% outer) work for most modules.
+  </Step>
+  <Step title="Calibrate center">
+    Either enable **Auto Calibration** to detect center on boot, or use the **Calibrate Stick** button for four-corner manual calibration.
+  </Step>
+  <Step title="Save">
+    Click **Save**. Test the stick output using the web configurator's input viewer or your target application.
+  </Step>
+</Steps>
+
+<Info>
+  When using auto-calibration, power on the device with the joystick at rest in the center position. The center value is sampled once at startup and does not update during play.
+</Info>

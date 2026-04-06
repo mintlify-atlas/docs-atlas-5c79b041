@@ -1,97 +1,77 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "GP2040-CE Documentation"
+description: "Multi-platform gamepad firmware for Raspberry Pi Pico and RP2040 boards. Ultra-low latency, 14+ input modes, and a built-in web configurator."
 ---
 
-## Setting up
+GP2040-CE (Community Edition) is open-source gamepad firmware for the Raspberry Pi Pico and other RP2040-based boards. It delivers sub-millisecond input latency, supports 14+ input modes, and includes a built-in browser-based configurator — no software installation required.
 
-Get your documentation site up and running in minutes.
+Compatible with PC, PS3, PS4, PS5, Nintendo Switch, Xbox One, Steam Deck, MiSTer, and Android.
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Download a pre-built firmware image and flash it to your board in minutes.
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Usage & Hotkeys" icon="gamepad" href="/usage">
+    Learn how to switch input modes, configure SOCD cleaning, and use hotkeys.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Web Configurator" icon="sliders" href="/web-configurator/overview">
+    Configure your controller through a browser — no software needed.
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="Supported Hardware" icon="microchip" href="/hardware/supported-boards">
+    Browse 50+ supported boards including Raspberry Pi Pico, FlatBox, and OpenCore.
   </Card>
-</Columns>
+</CardGroup>
 
-## Create beautiful pages
+## Get started in minutes
 
-Everything you need to create world-class documentation.
+<Steps>
+  <Step title="Download the firmware">
+    Grab the latest `.uf2` firmware file for your board from the [GP2040-CE releases page](https://github.com/OpenStickCommunity/GP2040-CE/releases).
+  </Step>
+  <Step title="Flash to your board">
+    Hold the BOOTSEL button on your Pico while plugging it in via USB. It will appear as a USB drive — drag and drop the `.uf2` file onto it.
+  </Step>
+  <Step title="Open the web configurator">
+    Unplug and replug your controller while holding the designated web configurator button (default: **S2**). Navigate to `http://192.168.7.1` in your browser.
+  </Step>
+  <Step title="Configure and play">
+    Map your pins, select your input mode, enable add-ons, and save. Your controller is ready to use.
+  </Step>
+</Steps>
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+## Why GP2040-CE?
 
-## Need inspiration?
+<CardGroup cols={2}>
+  <Card title="Ultra-Low Latency" icon="bolt">
+    Average input latency of **0.76ms** in XInput mode at 1000Hz polling — competitive with top-tier commercial controllers.
+  </Card>
+  <Card title="14+ Input Modes" icon="plug">
+    XInput, PS3, PS4, PS5, Nintendo Switch, Xbox One, Keyboard/HID, and more — switchable on the fly via hotkey.
+  </Card>
+  <Card title="Built-in Web UI" icon="globe">
+    Configure everything through a browser. No drivers, no desktop app — just plug in and go.
+  </Card>
+  <Card title="Powerful Add-ons" icon="puzzle-piece">
+    Turbo, analog input, RGB LEDs, OLED display, input macros, USB host passthrough, and many more.
+  </Card>
+  <Card title="SOCD Cleaning" icon="filter">
+    Multiple SOCD modes including Up Priority, Neutral, Second Input Priority, First Input Priority, and Bypass.
+  </Card>
+  <Card title="Open Source" icon="code">
+    MIT licensed. Build your own board configs, contribute add-ons, or fork the project for your needs.
+  </Card>
+</CardGroup>
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+## Explore the docs
+
+<CardGroup cols={3}>
+  <Card title="Add-ons" icon="plus" href="/add-ons/overview">
+    Extend your controller with turbo, macros, analog, LEDs, and more.
+  </Card>
+  <Card title="Input Modes" icon="gamepad" href="/input-modes/overview">
+    Understand each supported platform and how authentication works.
+  </Card>
+  <Card title="Build from Source" icon="hammer" href="/development/building">
+    Compile the firmware yourself and create custom board configurations.
+  </Card>
+</CardGroup>

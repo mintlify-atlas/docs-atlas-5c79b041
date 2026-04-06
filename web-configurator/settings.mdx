@@ -1,0 +1,224 @@
+---
+title: 'Settings'
+description: 'Configure input mode, D-pad mode, SOCD cleaning, hotkeys, forced setup mode, profiles, per-mode device type, and authentication options.'
+---
+
+The Settings page is divided into four tabs: **Input Mode**, **Gamepad Settings**, **Boot Input Mode**, and **Hotkeys**.
+
+---
+
+## Input mode
+
+Select the USB protocol the device presents to the host system.
+
+### Primary modes
+
+| Mode | Value | Notes |
+|---|---|---|
+| XInput | 0 | Xbox-compatible. Supported by most PC games. Requires authentication for some features. |
+| Xbox One (XBone) | 5 | Requires USB peripheral enabled. |
+| Xbox Original | 12 | Legacy Xbox support. |
+| PS3 | 2 | PlayStation 3 compatible. |
+| PS4 | 4 | PlayStation 4 compatible. Supports key-based or USB passthrough authentication. |
+| PS5 | 13 | PlayStation 5 compatible. Supports USB passthrough authentication. |
+| PS5 General (P5 General) | 16 | Requires USB passthrough authentication. |
+| Nintendo Switch | 1 | Nintendo Switch compatible. |
+| Nintendo Switch Pro | 15 | Nintendo Switch Pro Controller protocol. |
+| Keyboard | 3 | HID keyboard. Button-to-key mapping is configured on this page. |
+| Generic HID | 14 | Generic HID gamepad. |
+
+### Mini console modes
+
+| Mode | Value |
+|---|---|
+| MD Mini (Mega Drive Mini) | 6 |
+| Neo Geo Mini | 7 |
+| PCE Mini (PC Engine Mini) | 8 |
+| Egret II Mini | 9 |
+| Astro City Mini | 10 |
+| PS Classic | 11 |
+
+### Device type
+
+For modes that support multiple device types (XInput, PS3, PS4, PS5), an additional **Device Type** dropdown appears. Available options vary by mode:
+
+| Device type | Description |
+|---|---|
+| Gamepad | Standard gamepad |
+| Gamepad (Alt) | Alternate gamepad profile (PS3 only) |
+| Wheel | Racing wheel |
+| Guitar | Guitar Hero / Rock Band guitar |
+| Drum | Drum kit |
+| HOTAS | Hands On Throttle And Stick / flight stick |
+| Arcade Stick | Arcade stick device type (PS5) |
+| Mecha | Mechanical input device |
+
+### PS4 / PS5 mode options
+
+<Tabs>
+  <Tab title="PS4">
+    <AccordionGroup>
+      <Accordion title="Switch Touchpad and Share">
+        Swaps the Touchpad and Share button labels when PS4 mode is active.
+      </Accordion>
+      <Accordion title="Controller identification mode">
+        Controls how the device identifies itself to the PS4:
+        - **Console** — uses the hardware ID reported to the console
+        - **Emulation** — uses an emulated ID
+      </Accordion>
+      <Accordion title="Authentication type">
+        | Type | Description |
+        |---|---|
+        | None | No authentication. The device may be rejected by the PS4 after 8 minutes. |
+        | Key | Upload a private key, serial number, and signature file to authenticate as a licensed controller. |
+        | USB | Use a USB passthrough dongle (a licensed PS4 controller connected via USB host) for authentication. |
+      </Accordion>
+      <Accordion title="PS4 key upload (Key authentication)">
+        When **Key** authentication is selected, upload three files:
+        1. **Private key** — RSA 2048-bit private key in PEM format
+        2. **Serial number** — 16-character hex serial
+        3. **Signature** — 256-byte signature file
+
+        Click **Verify and Save** to validate and store the key material on the device.
+
+        <Warning>
+          The private key is stored on the device. Do not share your key files publicly.
+        </Warning>
+      </Accordion>
+    </AccordionGroup>
+  </Tab>
+  <Tab title="PS5">
+    PS5 mode options mirror PS4 with the following differences:
+    - Authentication options: **None** or **USB** (key-based authentication is not available for PS5).
+    - Without USB authentication, the device may be rejected by the PS5 after a timeout.
+    - The Switch Touchpad / Share option is also available.
+  </Tab>
+  <Tab title="XInput">
+    Authentication options:
+    - **None** — standard XInput without authentication
+    - **USB** — use a licensed Xbox controller via USB host for authentication
+
+    An optional **USB descriptor override** lets you change the product name, manufacturer string, version string, and USB VID/PID presented to the host.
+
+    <Warning>
+      Changing USB VID/PID to values you do not own may violate USB licensing terms.
+    </Warning>
+  </Tab>
+</Tabs>
+
+### Keyboard mode key mapping
+
+When **Keyboard** mode is selected, a key mapping table appears listing every button and D-pad direction with a configurable keyboard scancode. Assign the key you want each button to send.
+
+---
+
+## Gamepad settings
+
+### D-pad mode
+
+Controls how the D-pad inputs are reported to the host:
+
+| Mode | Value | Description |
+|---|---|---|
+| Digital | 0 | Standard directional pad |
+| Left Analog | 1 | D-pad emulates the left analog stick |
+| Right Analog | 2 | D-pad emulates the right analog stick |
+
+### 4-way joystick mode
+
+When enabled, the D-pad accepts only one direction at a time (no diagonals). Useful for certain arcade games.
+
+### SOCD cleaning mode
+
+Simultaneous Opposite Cardinal Directions (SOCD) cleaning defines what happens when two opposing directions are pressed at the same time.
+
+| Mode | Value | Behavior |
+|---|---|---|
+| Up Priority | 0 | Up + Down = Up; Left + Right = Neutral |
+| Neutral | 1 | Up + Down = Neutral; Left + Right = Neutral |
+| Second Input Priority (Last Win) | 2 | The most recently pressed direction wins |
+| First Input Priority (First Win) | 3 | The first pressed direction wins until released |
+| Bypass | 4 | No cleaning — both directions are reported |
+
+<Note>
+  SOCD cleaning rules may be restricted by tournament organizers. Consult the rules of your event before competing.
+</Note>
+
+### Forced setup mode
+
+Locks access to input mode switching, the web configurator, or both. Useful for tournament or kiosk use.
+
+| Mode | Value | Description |
+|---|---|---|
+| Off | 0 | No restrictions |
+| Disable input mode switch | 1 | Prevents boot-time input mode selection |
+| Disable web config | 2 | Prevents access to the web configurator |
+| Disable both | 3 | Prevents both mode switching and web config access |
+
+<Warning>
+  Selecting **Disable web config** or **Disable both** requires typing `GP2040-CE` to confirm. Once applied, the web configurator cannot be accessed without flashing the firmware again.
+</Warning>
+
+### Profile selection
+
+Select the active profile (1–6). Only enabled profiles appear in the list. Profiles are configured in the **Pin Mapping** page.
+
+### Debounce delay
+
+Sets the input debounce delay in milliseconds. Higher values reduce spurious inputs from noisy switches. The default is suitable for most mechanical switches.
+
+---
+
+## Boot input mode
+
+Assign a specific input mode to be activated when a particular button is held at boot time. Up to 8 buttons can be configured (B1, B2, B3, B4, L1, L2, R1, R2). The available modes match the primary input modes.
+
+This allows switching between XInput, PS4, Switch, and other modes by holding a button while plugging in the device.
+
+---
+
+## Hotkeys
+
+Hotkeys are button combos that trigger firmware actions at runtime without rebooting. Up to **16 hotkeys** can be configured.
+
+Each hotkey has:
+- **Button combination** — one or more buttons that must be held simultaneously
+- **Function key** — an optional auxiliary modifier (typically the `FN` pin action)
+- **Action** — the function to perform
+
+<Note>
+  Duplicate button combinations across hotkeys are not allowed and will show a validation error.
+</Note>
+
+### Available hotkey actions
+
+<AccordionGroup>
+  <Accordion title="D-pad and joystick mode">
+    - Switch D-pad to Digital, Left Analog, or Right Analog
+    - Invert X axis / Invert Y axis
+    - Toggle 4-way joystick mode / Enable / Disable
+    - Toggle DDI 4-way joystick mode
+  </Accordion>
+  <Accordion title="SOCD cleaning">
+    - Set SOCD to Up Priority, Neutral, Second Input, First Input, or Bypass
+  </Accordion>
+  <Accordion title="Profile management">
+    - Load Profile 1–6
+    - Next Profile / Previous Profile
+  </Accordion>
+  <Accordion title="Button simulation">
+    Hotkeys can simulate button presses for: B1–B4, L1, R1, L2, R2, S1, S2, A1, A2, A3, A4, L3, R3, Touchpad, D-pad Up/Down/Left/Right, LS Up/Down/Left/Right, RS Up/Down/Left/Right.
+  </Accordion>
+  <Accordion title="System actions">
+    - Home button
+    - Capture button
+    - Reboot to default
+    - Save config
+    - Focus mode toggle
+    - Turbo count up / down
+  </Accordion>
+  <Accordion title="Menu navigation">
+    - Menu navigate up, down, left, right
+    - Menu select, back, toggle
+  </Accordion>
+</AccordionGroup>

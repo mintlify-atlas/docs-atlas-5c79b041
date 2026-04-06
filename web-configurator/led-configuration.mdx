@@ -1,0 +1,150 @@
+---
+title: 'LED configuration'
+description: 'Configure RGB LEDs, player LEDs, case lighting, brightness, button order, and animation effects for GP2040-CE.'
+---
+
+The LED Configuration page is divided into three sections: **RGB LED settings**, **RGB LED order**, and **Player LEDs**. An additional **Case RGB** section controls ambient case lighting.
+
+---
+
+## RGB LED settings
+
+### LED data pin
+
+The GPIO pin connected to the data line of your WS2812B or SK6812 LED strip. Set to `-1` to disable RGB LEDs. Valid range is 0–29.
+
+### LED format
+
+The color channel order of your LED strip. Match this to your specific LED hardware:
+
+| Format | Value | Description |
+|---|---|---|
+| GRB | 0 | Green-Red-Blue (most WS2812B LEDs) |
+| RGB | 1 | Red-Green-Blue |
+| GRBW | 2 | Green-Red-Blue-White (SK6812 RGBW) |
+| RGBW | 3 | Red-Green-Blue-White (SK6812 RGBW) |
+
+<Tip>
+  Most WS2812B-compatible LEDs use GRB order. If your colors appear incorrect, try switching between GRB and RGB.
+</Tip>
+
+### LED layout
+
+Defines which button layout template is used to determine the physical arrangement of buttons for LED indexing. Select the layout that matches your controller's physical button arrangement.
+
+### LEDs per button
+
+The number of individual LEDs per button position. For example, if each button has a ring of 3 LEDs, set this to `3`. Minimum value is `1`.
+
+### Maximum brightness
+
+The maximum brightness level for RGB LEDs, from 0 (off) to 255 (full brightness). This is the ceiling used when brightness is at its maximum step.
+
+### Brightness steps
+
+The number of discrete brightness levels available when cycling brightness with hotkeys. Valid range is 1–10.
+
+### Turn off when suspended
+
+When enabled, RGB LEDs turn off while the host system is suspended (sleeping).
+
+---
+
+## RGB LED order
+
+The LED order section lets you specify which buttons are assigned to which LED index positions in the chain. This controls which physical LED lights up for each button press.
+
+Buttons are shown in two lists:
+
+- **Available** — buttons not yet assigned to an LED index
+- **Assigned** — buttons in their current LED order
+
+Drag buttons between the lists and reorder the assigned list to match your physical LED wiring. The LED start index for each button is derived from its position in the assigned list multiplied by the LEDs per button value.
+
+---
+
+## Player LEDs (PLED)
+
+Player LEDs indicate which player slot (1–4) the controller occupies on consoles that support it (PS3, PS4).
+
+### PLED type
+
+| Type | Value | Description |
+|---|---|---|
+| Off | -1 | Player LEDs disabled |
+| PWM | 0 | Dedicated GPIO pins driving LEDs via PWM (non-addressable) |
+| RGB | 1 | Player LEDs are part of the RGB LED chain |
+
+### PWM mode (PLED type: PWM)
+
+Assign GPIO pin numbers for up to four player LED indicators (PLED #1 Pin through PLED #4 Pin). Each pin drives one LED directly.
+
+### RGB mode (PLED type: RGB)
+
+Assign LED index positions within the RGB chain for up to four player indicators (PLED #1 Index through PLED #4 Index). The index value is the position of the first LED in the chain assigned to that player slot.
+
+Set a **PLED color** for the RGB player LEDs using the color picker. A set of preset colors is available, or you can enter a custom hex value.
+
+<Note>
+  When RGB player LEDs are configured, their index positions are appended after all button LEDs in the chain. The start index is shown dynamically based on the number of assigned button LEDs and LEDs per button.
+</Note>
+
+---
+
+## Case RGB
+
+Case RGB controls ambient LEDs inside the controller case that are separate from the per-button LEDs.
+
+### Case type
+
+| Type | Value | Description |
+|---|---|---|
+| Off | -1 | Case LEDs disabled |
+| Ambient | 0 | Case LEDs run an independent ambient animation |
+| Linked | 1 | Case LEDs mirror the button LED animation |
+
+### Case LED index
+
+The starting index in the RGB LED chain where case LEDs begin. Only shown when case type is not Off.
+
+### Case LED count
+
+The number of LEDs in the case section. Valid range is 0–100.
+
+---
+
+## Animation effects
+
+Animation effects are controlled at runtime using hotkeys (configured in the Settings page). The available effects come from the `AnimationEffects` enum:
+
+| Effect | Value | Description |
+|---|---|---|
+| Static Color | 0 | All LEDs show a single static color |
+| Rainbow | 1 | Cycling rainbow across all LEDs |
+| Chase | 2 | A chasing light pattern around the button layout |
+| Static Theme | 3 | A predefined color theme with per-button static colors |
+| Custom Theme | 4 | User-defined per-button colors for both idle and pressed states |
+
+### Custom theme
+
+When Custom Theme is active, each button can be assigned two colors:
+- **Idle color** — shown when the button is not pressed
+- **Pressed color** — shown when the button is held
+
+Colors are chosen from the `AnimationColor` palette:
+Black, White, Red, Orange, Yellow, Lime Green, Green, Seafoam, Aqua, Sky Blue, Blue, Purple, Pink, Magenta, Indigo, Violet.
+
+---
+
+## Reactive LED mode
+
+The Reactive LED add-on allows individual GPIO pins to drive external LEDs that react to button presses. Each reactive LED entry is configured with a pin, a button action to react to, and independent behaviors for button-down and button-up events:
+
+| Mode | Value | Description |
+|---|---|---|
+| Static Off | 0 | LED stays off |
+| Static On | 1 | LED stays on |
+| Fade In | 2 | LED fades in when the condition is met |
+| Fade Out | 3 | LED fades out when the condition is met |
+
+These are configured under Add-ons, not the LED Configuration page, but they share the same `ReactiveLEDMode` enum.

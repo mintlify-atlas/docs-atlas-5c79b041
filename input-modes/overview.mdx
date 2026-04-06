@@ -1,0 +1,179 @@
+---
+title: 'Input modes overview'
+description: 'All supported input modes in GP2040-CE, how to switch between them, and how button labels map across platforms.'
+---
+
+GP2040-CE presents itself to the host as a different USB device depending on the selected input mode. Each mode uses a dedicated driver that handles report formatting, authentication (where required), and device-specific behavior.
+
+## Supported modes
+
+<CardGroup cols={2}>
+  <Card title="XInput" icon="gamepad" href="/input-modes/xinput">
+    Xbox 360 / Xbox One compatible. Works on Windows, Steam Deck, and Android without additional drivers.
+  </Card>
+  <Card title="PlayStation" icon="gamepad" href="/input-modes/playstation">
+    PS3, PS4, and PS5 modes. PS4 and PS5 require authentication to work on console hardware.
+  </Card>
+  <Card title="Nintendo Switch" icon="gamepad" href="/input-modes/nintendo-switch">
+    Enumerates as a Switch Pro Controller. No authentication required.
+  </Card>
+  <Card title="Keyboard" icon="keyboard" href="/input-modes/keyboard">
+    USB HID keyboard (and optional mouse). Fully remappable via the web configurator.
+  </Card>
+</CardGroup>
+
+### Primary modes
+
+| Enum value | Mode | Notes |
+|---|---|---|
+| `INPUT_MODE_XINPUT` (0) | XInput (Xbox 360/One) | No drivers needed on Windows |
+| `INPUT_MODE_SWITCH` (1) | Nintendo Switch | Pro Controller emulation |
+| `INPUT_MODE_PS3` (2) | PlayStation 3 | Simple HID, no auth required |
+| `INPUT_MODE_KEYBOARD` (3) | Keyboard / Mouse HID | Fully remappable key mapping |
+| `INPUT_MODE_PS4` (4) | PlayStation 4 | Auth required for console use |
+| `INPUT_MODE_XBONE` (5) | Xbox One | Requires USB host peripheral |
+| `INPUT_MODE_PS5` (13) | PlayStation 5 | Auth required for console use |
+| `INPUT_MODE_GENERIC` (14) | Generic HID | Standard HID gamepad |
+| `INPUT_MODE_SWITCH_PRO` (15) | Switch Pro Controller | Enhanced Switch compatibility |
+| `INPUT_MODE_P5GENERAL` (16) | PS5 General (PC only) | Non-authenticated PS5 use on PC |
+| `INPUT_MODE_XBOXORIGINAL` (12) | Original Xbox | Legacy Xbox support |
+
+### Mini console modes
+
+These modes target specific retro mini consoles and use simple HID profiles with no authentication.
+
+| Enum value | Mode |
+|---|---|
+| `INPUT_MODE_MDMINI` (6) | Sega Genesis / Mega Drive Mini |
+| `INPUT_MODE_NEOGEO` (7) | Neo Geo Mini |
+| `INPUT_MODE_PCEMINI` (8) | PC Engine Mini |
+| `INPUT_MODE_EGRET` (9) | Taito Egret II Mini |
+| `INPUT_MODE_ASTRO` (10) | Astro City Mini |
+| `INPUT_MODE_PSCLASSIC` (11) | PlayStation Classic |
+
+## Switching input modes
+
+GP2040-CE has two mechanisms for selecting an input mode.
+
+### Boot-time hotkey
+
+Hold one of the mapped buttons while plugging in the controller. Each button (B1–B4, L1, L2, R1, R2) can be assigned a boot mode in the web configurator under **Settings → Boot Input Mode**. When you hold a button during power-on, the firmware starts in the mode assigned to that button.
+
+<Steps>
+  <Step title="Open the web configurator">
+    Connect the controller to a PC and navigate to the GP2040-CE web configurator.
+  </Step>
+  <Step title="Go to Settings → Boot Input Mode">
+    Each of the eight buttons (B1, B2, B3, B4, L1, L2, R1, R2) can be assigned an input mode.
+  </Step>
+  <Step title="Save and reboot">
+    Save the settings. On next power-on, hold the corresponding button to start in that mode.
+  </Step>
+</Steps>
+
+### Default mode
+
+Set a persistent default mode in the web configurator under **Settings → Input Mode**. The controller will always start in this mode unless a boot-time button is held.
+
+### Runtime hotkeys
+
+Up to 16 hotkey combinations can be configured. Hotkeys are triggered by holding a combination of buttons while the controller is connected. The `HOTKEY_REBOOT_DEFAULT` action reboots into the default input mode.
+
+<Info>
+The firmware stores the active input mode across reboots. The next time the controller is plugged in without any boot buttons held, it resumes in the last-used default mode.
+</Info>
+
+## Authentication requirements
+
+Some modes require additional hardware or credentials to operate on console hardware.
+
+| Mode | PC | Console |
+|---|---|---|
+| XInput | No auth needed | N/A (PC only) |
+| PS3 | No auth needed | No auth needed |
+| PS4 | No auth needed | Requires auth (keys or USB dongle) |
+| PS5 | No auth needed | Requires auth (USB dongle) |
+| Xbox One | Requires USB host | Requires USB host + auth |
+
+<Warning>
+Without authentication, PS4 and PS5 modes work as a standard HID gamepad on PC but will not be recognized as a valid controller by PS4 or PS5 console hardware. Configure authentication before using these modes on a console.
+</Warning>
+
+## Button label mapping
+
+GP2040-CE uses a platform-neutral internal button naming scheme. The labels shown in the web configurator map to platform-specific names.
+
+<Tabs>
+  <Tab title="XInput (Xbox)">
+    | GP2040-CE | Xbox label |
+    |---|---|
+    | B1 | A |
+    | B2 | B |
+    | B3 | X |
+    | B4 | Y |
+    | L1 | LB |
+    | R1 | RB |
+    | L2 | LT |
+    | R2 | RT |
+    | S1 | Back / View |
+    | S2 | Start / Menu |
+    | A1 | Guide (Home) |
+    | L3 | LS (left stick click) |
+    | R3 | RS (right stick click) |
+  </Tab>
+  <Tab title="PlayStation">
+    | GP2040-CE | PS label |
+    |---|---|
+    | B1 | Cross |
+    | B2 | Circle |
+    | B3 | Square |
+    | B4 | Triangle |
+    | L1 | L1 |
+    | R1 | R1 |
+    | L2 | L2 |
+    | R2 | R2 |
+    | S1 | Select / Share |
+    | S2 | Start / Options |
+    | A1 | Home / PS |
+    | A2 | Touchpad |
+    | L3 | L3 |
+    | R3 | R3 |
+  </Tab>
+  <Tab title="Nintendo Switch">
+    | GP2040-CE | Switch label |
+    |---|---|
+    | B1 | B |
+    | B2 | A |
+    | B3 | Y |
+    | B4 | X |
+    | L1 | L |
+    | R1 | R |
+    | L2 | ZL |
+    | R2 | ZR |
+    | S1 | Minus |
+    | S2 | Plus |
+    | A1 | Home |
+    | A2 | Capture |
+    | L3 | LS |
+    | R3 | RS |
+  </Tab>
+  <Tab title="Keyboard">
+    | GP2040-CE | Default key |
+    |---|---|
+    | B1 | Configurable |
+    | B2 | Configurable |
+    | B3 | Configurable |
+    | B4 | Configurable |
+    | L1 | Configurable |
+    | R1 | Configurable |
+    | L2 | Configurable |
+    | R2 | Configurable |
+    | S1 | Configurable |
+    | S2 | Configurable |
+    | A1 | Configurable |
+    | A2 | Configurable |
+    | D-pad | Configurable |
+
+    All keys are individually remappable via the web configurator's Keyboard Mapper.
+  </Tab>
+</Tabs>

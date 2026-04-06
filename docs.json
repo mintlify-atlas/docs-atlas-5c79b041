@@ -1,122 +1,96 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "GP2040-CE",
+  "theme": "aspen",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#e90b8b",
+    "light": "#88345c",
+    "dark": "#ab0466"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "https://media.brand.dev/ab95a44a-6b8d-41c7-a1d7-492a3d932d07.png",
+  "logo": {
+    "light": "https://media.brand.dev/dfcb6676-ad5d-416c-9848-a78cd950b032.png",
+    "dark": "https://media.brand.dev/dfcb6676-ad5d-416c-9848-a78cd950b032.png"
+  },
+  "navbar": {
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/OpenStickCommunity/GP2040-CE"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/OpenStickCommunity/GP2040-CE"
+    }
+  },
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Documentation",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Get Started",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
+              "introduction",
+              "installation",
+              "usage"
             ]
           },
           {
-            "group": "Customization",
+            "group": "Web Configurator",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
+              "web-configurator/overview",
+              "web-configurator/pin-mapping",
+              "web-configurator/settings",
+              "web-configurator/led-configuration",
+              "web-configurator/display-configuration"
             ]
           },
           {
-            "group": "Writing content",
+            "group": "Add-ons",
             "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
+              "add-ons/overview",
+              "add-ons/analog-input",
+              "add-ons/turbo",
+              "add-ons/socd-cleaning",
+              "add-ons/rgb-leds",
+              "add-ons/input-macros",
+              "add-ons/usb-host"
             ]
           },
           {
-            "group": "AI tools",
+            "group": "Input Modes",
             "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "input-modes/overview",
+              "input-modes/xinput",
+              "input-modes/playstation",
+              "input-modes/nintendo-switch",
+              "input-modes/keyboard"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "Hardware",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Getting Started",
             "pages": [
-              "api-reference/introduction"
+              "hardware/supported-boards",
+              "hardware/wiring",
+              "hardware/flashing"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Building from Source",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "development/building",
+              "development/custom-board-config",
+              "development/contributing"
             ]
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
-  },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
-  "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
-    }
-  },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
-  },
-  "footer": {
-    "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
-    }
+    ]
   }
 }

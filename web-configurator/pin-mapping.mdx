@@ -1,0 +1,202 @@
+---
+title: 'Pin mapping'
+description: 'Assign GPIO pins to button actions, D-pad directions, analog inputs, and special functions. GP2040-CE supports up to 5 named profiles, each with an independent pin map.'
+---
+
+## What is pin mapping?
+
+Pin mapping connects the physical GPIO pins on your RP2040 board (labeled GP0 through GP29) to logical gamepad actions. Each pin can be assigned one action — a button press, a D-pad direction, an analog axis direction, a sustain mode, a macro trigger, or a special function.
+
+The pin mapping page shows a grid of all available GPIO pins. For each pin, you select one or more actions from a grouped dropdown.
+
+<Warning>
+  Mapping a pin to a function that is not physically connected can leave the device in a non-functional state. If that happens, go to the **Reset Settings** page to clear the invalid configuration.
+</Warning>
+
+## Profiles
+
+GP2040-CE supports up to **6 independent profiles**, each with its own complete pin map and a custom label (up to 16 alphanumeric characters). Profiles let you switch button layouts on the fly using hotkeys without replugging the device.
+
+- **Profile 1** is the base profile and is always enabled.
+- **Profiles 2–6** can be enabled or disabled individually. The active profile cannot be disabled.
+- The **Copy Base Profile** button copies Profile 1's pin assignments into the current profile as a starting point.
+- Use the **Capture** button to physically press a button and automatically detect which GPIO pin it is connected to.
+
+<Info>
+  The active profile is selected in the **Settings** page under the Profile dropdown. Profiles can also be switched at runtime using hotkey combos.
+</Info>
+
+## GPIO actions (GpioAction)
+
+The following actions can be assigned to any GPIO pin. Actions are grouped into **Buttons** (standard button and D-pad presses) and **Actions** (special functions).
+
+### Special values
+
+| Action | Description |
+|---|---|
+| `NONE` | Pin is unused. Default for unassigned pins. |
+| `ASSIGNED_TO_ADDON` | Pin is controlled by an add-on (e.g. analog stick, SNES adapter). Cannot be changed here. |
+| `RESERVED` | Pin is reserved by the firmware or hardware and cannot be assigned. |
+| `CUSTOM_BUTTON_COMBO` | Pin triggers a combination of multiple button actions simultaneously. |
+
+### Standard button presses
+
+These map a pin to a gamepad button. The exact button label shown in the UI depends on the active button label set (XInput, PS, Switch, etc.).
+
+| Action | Description |
+|---|---|
+| `BUTTON_PRESS_UP` | D-pad Up |
+| `BUTTON_PRESS_DOWN` | D-pad Down |
+| `BUTTON_PRESS_LEFT` | D-pad Left |
+| `BUTTON_PRESS_RIGHT` | D-pad Right |
+| `BUTTON_PRESS_B1` | Button 1 (A / Cross / B) |
+| `BUTTON_PRESS_B2` | Button 2 (B / Circle / A) |
+| `BUTTON_PRESS_B3` | Button 3 (X / Square / Y) |
+| `BUTTON_PRESS_B4` | Button 4 (Y / Triangle / X) |
+| `BUTTON_PRESS_L1` | Left Bumper (LB / L1) |
+| `BUTTON_PRESS_R1` | Right Bumper (RB / R1) |
+| `BUTTON_PRESS_L2` | Left Trigger (LT / L2) |
+| `BUTTON_PRESS_R2` | Right Trigger (RT / R2) |
+| `BUTTON_PRESS_S1` | Select / Share / Back |
+| `BUTTON_PRESS_S2` | Start / Options / Start |
+| `BUTTON_PRESS_L3` | Left Stick Click |
+| `BUTTON_PRESS_R3` | Right Stick Click |
+| `BUTTON_PRESS_A1` | Auxiliary 1 (Home / PS / Guide) |
+| `BUTTON_PRESS_A2` | Auxiliary 2 (Capture / Touchpad) |
+| `BUTTON_PRESS_A3` | Auxiliary 3 |
+| `BUTTON_PRESS_A4` | Auxiliary 4 |
+| `BUTTON_PRESS_FN` | Function / modifier key |
+| `BUTTON_PRESS_TURBO` | Turbo button |
+| `BUTTON_PRESS_MACRO` | Generic macro trigger |
+| `BUTTON_PRESS_MACRO_1` – `BUTTON_PRESS_MACRO_6` | Macro slots 1–6 |
+| `BUTTON_PRESS_INPUT_REVERSE` | Input reverse toggle |
+| `BUTTON_PRESS_E1` – `BUTTON_PRESS_E12` | Extended buttons 1–12 |
+
+### DDI (Dual Directional Input) buttons
+
+| Action | Description |
+|---|---|
+| `BUTTON_PRESS_DDI_UP` | DDI Up |
+| `BUTTON_PRESS_DDI_DOWN` | DDI Down |
+| `BUTTON_PRESS_DDI_LEFT` | DDI Left |
+| `BUTTON_PRESS_DDI_RIGHT` | DDI Right |
+
+### Digital directions
+
+These send a digital directional signal independently of the main D-pad.
+
+| Action | Description |
+|---|---|
+| `DIGITAL_DIRECTION_UP` | Digital Up |
+| `DIGITAL_DIRECTION_DOWN` | Digital Down |
+| `DIGITAL_DIRECTION_LEFT` | Digital Left |
+| `DIGITAL_DIRECTION_RIGHT` | Digital Right |
+
+### Analog directions
+
+These move a virtual analog stick axis when the pin is held.
+
+| Action | Description |
+|---|---|
+| `ANALOG_DIRECTION_LS_X_NEG` | Left Stick X negative (left) |
+| `ANALOG_DIRECTION_LS_X_POS` | Left Stick X positive (right) |
+| `ANALOG_DIRECTION_LS_Y_NEG` | Left Stick Y negative (up) |
+| `ANALOG_DIRECTION_LS_Y_POS` | Left Stick Y positive (down) |
+| `ANALOG_DIRECTION_RS_X_NEG` | Right Stick X negative (left) |
+| `ANALOG_DIRECTION_RS_X_POS` | Right Stick X positive (right) |
+| `ANALOG_DIRECTION_RS_Y_NEG` | Right Stick Y negative (up) |
+| `ANALOG_DIRECTION_RS_Y_POS` | Right Stick Y positive (down) |
+| `ANALOG_DIRECTION_MOD_LOW` | Analog modifier — low precision |
+| `ANALOG_DIRECTION_MOD_HIGH` | Analog modifier — high precision |
+
+### Sustain mode actions
+
+Sustain actions lock a mode while the pin is held, without requiring a hotkey combo.
+
+| Action | Description |
+|---|---|
+| `SUSTAIN_DP_MODE_DP` | Lock D-pad to digital mode |
+| `SUSTAIN_DP_MODE_LS` | Lock D-pad to left analog |
+| `SUSTAIN_DP_MODE_RS` | Lock D-pad to right analog |
+| `SUSTAIN_SOCD_MODE_UP_PRIO` | Lock SOCD to Up Priority |
+| `SUSTAIN_SOCD_MODE_NEUTRAL` | Lock SOCD to Neutral |
+| `SUSTAIN_SOCD_MODE_SECOND_WIN` | Lock SOCD to Second Input Priority |
+| `SUSTAIN_SOCD_MODE_FIRST_WIN` | Lock SOCD to First Input Priority |
+| `SUSTAIN_SOCD_MODE_BYPASS` | Lock SOCD to Bypass |
+| `SUSTAIN_FOCUS_MODE` | Activate Focus Mode while held |
+| `SUSTAIN_4_8_WAY_MODE` | Sustain 4-way / 8-way mode |
+
+### Menu navigation
+
+| Action | Description |
+|---|---|
+| `MENU_NAVIGATION_UP` | Menu up |
+| `MENU_NAVIGATION_DOWN` | Menu down |
+| `MENU_NAVIGATION_LEFT` | Menu left |
+| `MENU_NAVIGATION_RIGHT` | Menu right |
+| `MENU_NAVIGATION_SELECT` | Menu select |
+| `MENU_NAVIGATION_BACK` | Menu back |
+| `MENU_NAVIGATION_TOGGLE` | Toggle menu |
+
+### Guitar mode actions
+
+| Action | Description |
+|---|---|
+| `MODE_GUITAR_FRET_GREEN` – `MODE_GUITAR_FRET_ORANGE` | Standard fret buttons |
+| `MODE_GUITAR_FRET_SOLO_GREEN` – `MODE_GUITAR_FRET_SOLO_ORANGE` | Solo fret buttons |
+| `MODE_GUITAR_WHAMMY` | Whammy bar |
+| `MODE_GUITAR_PICKUP` | Pickup switch |
+| `MODE_GUITAR_TILT` | Tilt sensor |
+
+### Drum mode actions
+
+| Action | Description |
+|---|---|
+| `MODE_DRUM_RED_DRUMPAD` – `MODE_DRUM_GREEN_DRUMPAD` | Drum pads |
+| `MODE_DRUM_YELLOW_CYMBAL` – `MODE_DRUM_GREEN_CYMBAL` | Cymbals |
+| `MODE_DRUM_KICK_PEDAL_LEFT` | Left kick pedal |
+| `MODE_DRUM_KICK_PEDAL_RIGHT` | Right kick pedal |
+
+### HOTAS (flight stick) actions
+
+| Action | Description |
+|---|---|
+| `MODE_HOTAS_RUDDER_LEFT` / `RIGHT` | Rudder |
+| `MODE_HOTAS_THROTTLE_FORWARD` / `REVERSE` | Throttle |
+| `MODE_HOTAS_ROCKER_LEFT` / `RIGHT` | Rocker |
+| `MODE_HOTAS_PEDAL_LEFT` / `RIGHT` | Pedals |
+| `MODE_HOTAS_PEDAL_RUDDER_LEFT` / `RIGHT` | Pedal rudder |
+
+### Wheel mode actions
+
+| Action | Description |
+|---|---|
+| `MODE_WHEEL_STEERING_LEFT` / `RIGHT` | Steering |
+| `MODE_WHEEL_SHIFTER_GEAR_1` – `GEAR_6` | Gear shifter 1–6 |
+| `MODE_WHEEL_SHIFTER_GEAR_R` | Reverse |
+| `MODE_WHEEL_SHIFTER_GEAR_N` | Neutral |
+| `MODE_WHEEL_SHIFTER_GEAR_UP` / `DOWN` | Sequential gear shift |
+| `MODE_WHEEL_BUTTON_PLUS` / `MINUS` | +/- buttons |
+| `MODE_WHEEL_DIAL_UP` / `DOWN` / `ENTER` | Dial |
+| `MODE_WHEEL_PEDAL_GAS` / `BRAKE` / `CLUTCH` | Pedals |
+
+## Configuring pin mappings
+
+<Steps>
+  <Step title="Select a profile">
+    Choose a profile tab from the left sidebar. Profile 1 is the base profile; profiles 2–6 require enabling before they can be saved.
+  </Step>
+  <Step title="Assign actions to pins">
+    For each GPIO pin (GP0–GP29), use the dropdown to assign one or more actions. Buttons and D-pad actions can be combined on a single pin using the multi-select. Actions (mode sustains, navigation) are single-select only.
+  </Step>
+  <Step title="Use the Capture button (optional)">
+    Click **Capture** and press a physical button on the device to automatically identify which GPIO pin it is wired to.
+  </Step>
+  <Step title="Save">
+    Click **Save** to write the profile's pin map to flash memory.
+  </Step>
+</Steps>
+
+<Warning>
+  Do not assign the same action to two different pins within the same profile. Duplicate assignments can cause unexpected behavior such as stuck inputs.
+</Warning>

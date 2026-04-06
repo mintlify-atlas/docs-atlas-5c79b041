@@ -1,0 +1,122 @@
+---
+title: Flashing firmware
+description: How to flash GP2040-CE firmware onto an RP2040 board using BOOTSEL mode or the web configurator.
+---
+
+Flashing firmware is the process of writing a `.uf2` file onto the RP2040's flash memory. The RP2040 has a built-in USB bootloader (BOOTSEL mode) that exposes the chip as a USB mass storage drive, making flashing as simple as dragging and dropping a file.
+
+<Warning>
+  Use a **data-capable USB cable**. Many USB cables sold with consumer electronics are charge-only and do not include the data lines. If the board never appears as a USB drive or gamepad on your computer, try a different cable first.
+</Warning>
+
+## Prerequisites
+
+- A USB cable with data lines (not charge-only)
+- A computer with a modern web browser
+- The correct `.uf2` firmware file for your board (downloaded from the GP2040-CE releases page)
+
+<Note>
+  Make sure you download the firmware build that matches your board exactly. Using the wrong firmware will assign incorrect GPIO pins and the controller will not work as expected. Refer to [Supported boards](/hardware/supported-boards) for the correct build name for your hardware.
+</Note>
+
+## Method 1: BOOTSEL mode
+
+BOOTSEL mode is the standard way to flash firmware onto any RP2040 board. Use this method for an initial flash or when re-flashing from an older version.
+
+<Steps>
+  <Step title="Download the firmware">
+    Go to the [GP2040-CE releases page on GitHub](https://github.com/OpenStickCommunity/GP2040-CE/releases) and download the `.uf2` file for your board. The file will be named after your board, for example `GP2040-CE_X.X.X_Pico.uf2`.
+  </Step>
+  <Step title="Enter BOOTSEL mode">
+    <Tabs>
+      <Tab title="Unpowered board">
+        Hold the **BOOTSEL** button on the board, then plug the USB cable into your computer while continuing to hold the button. Release the button after the board is connected.
+      </Tab>
+      <Tab title="Already connected board">
+        Hold the **BOOTSEL** button, briefly press and release the **RESET** button (if present), then release **BOOTSEL**. On boards without a RESET button, unplug and replug the USB cable while holding BOOTSEL.
+      </Tab>
+    </Tabs>
+
+    The onboard LED (if present) will turn off and the board will stop acting as a gamepad.
+  </Step>
+  <Step title="Verify the USB drive appears">
+    Your computer should detect a new USB mass storage device named **RPI-RP2**. It will appear as a removable drive in your file manager (Windows Explorer, macOS Finder, or a Linux file manager).
+
+    If the drive does not appear, try a different USB cable or a different USB port on your computer.
+  </Step>
+  <Step title="Copy the firmware file">
+    Drag and drop (or copy and paste) the `.uf2` file onto the **RPI-RP2** drive. Do not eject the drive manually — the board handles this automatically.
+  </Step>
+  <Step title="Board reboots automatically">
+    The board will reboot itself as soon as the file transfer completes. The **RPI-RP2** drive will disappear and the board will re-enumerate as a USB HID gamepad device within a few seconds.
+  </Step>
+</Steps>
+
+## Method 2: Web configurator firmware update
+
+If the board is already running GP2040-CE, you can update the firmware without entering BOOTSEL mode manually through the web configurator.
+
+<Steps>
+  <Step title="Connect to the web configurator">
+    Hold the **S2** button (Start on XInput, Plus on Switch) while plugging in the USB cable. The board will enter web configurator mode. Open a browser and navigate to `http://192.168.7.1`.
+  </Step>
+  <Step title="Navigate to the update page">
+    In the web configurator, go to **Configuration** → **Data Backup and Restoration**. Look for the firmware update or reboot-to-BOOTSEL option.
+  </Step>
+  <Step title="Reboot to BOOTSEL">
+    Click the button to reboot the board into BOOTSEL mode. The board will disconnect from the web configurator and appear as an **RPI-RP2** USB drive on your computer.
+  </Step>
+  <Step title="Copy the firmware file">
+    Drag and drop the new `.uf2` file onto the **RPI-RP2** drive. The board will flash and reboot automatically.
+  </Step>
+</Steps>
+
+<Info>
+  Settings stored in flash memory (button mappings, add-on configuration, LED settings) are preserved when updating firmware in most cases. However, a major version update may reset settings if the configuration format has changed. Back up your settings from the web configurator before updating.
+</Info>
+
+## Verifying the flash
+
+After flashing, confirm the firmware is running correctly:
+
+- The board should enumerate as a USB HID gamepad (or XInput device, depending on configuration) in your operating system's device list.
+- On Windows, it will appear in **Devices and Printers** or in the **Game Controllers** control panel (`joy.cpl`).
+- Hold the **S2** button while plugging in to enter web configurator mode. Navigate to `http://192.168.7.1` in a browser — you should see the GP2040-CE configuration interface.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Board doesn't appear as a USB drive (RPI-RP2 not showing up)">
+    **Try these steps in order:**
+
+    1. **Use a different USB cable.** Charge-only cables are the most common cause of this issue. Use a cable you know works for data transfer (e.g., one that came with a phone and can sync files).
+    2. **Try a different USB port.** Some USB hubs and front-panel ports are unreliable. Try a port directly on your motherboard or laptop.
+    3. **Hold BOOTSEL more firmly.** If the button is not held when the board enumerates, it boots normally instead of entering BOOTSEL mode. Try again, holding the button before plugging in and keeping it held for a full second after the cable is connected.
+    4. **Check for shorts.** If you are working with bare wires, ensure no GPIO pins are shorted to GND, which could prevent the board from enumerating.
+    5. **Try a different computer.** Some system USB configurations can cause recognition issues.
+  </Accordion>
+  <Accordion title="Wrong firmware file flashed (board doesn't work or behaves unexpectedly)">
+    Flashing the wrong `.uf2` file will not permanently damage the board — the RP2040 bootloader is stored in ROM and cannot be overwritten. Re-enter BOOTSEL mode and flash the correct firmware file.
+
+    To identify the correct file, check the [Supported boards](/hardware/supported-boards) page and match your physical board to the correct build name. When in doubt, use the **Pico** build for a bare Raspberry Pi Pico, or the **PicoW** build for the Pico W.
+  </Accordion>
+  <Accordion title="Web configurator not accessible at http://192.168.7.1">
+    The web configurator requires the board to be in **web configurator mode**, activated by holding **S2** (the Start/Plus button) while plugging in the USB cable.
+
+    **Common causes:**
+
+    - **S2 button not held during plug-in.** The board boots as a normal gamepad if S2 is not held at power-on. Unplug, hold S2, and plug in again.
+    - **Firewall or network settings.** The board presents itself as a USB network adapter (RNDIS on Windows, CDC-ECM on macOS/Linux). If your OS does not install the driver automatically, the network interface will not come up. On Windows 7/8, you may need to install the RNDIS driver manually.
+    - **Browser issue.** Try a different browser or clear the browser cache. The configurator is a local web app served from the device and does not require internet access.
+    - **Wrong IP address.** The default address is `192.168.7.1`. If you have changed the network configuration, try `http://192.168.7.1` explicitly (not HTTPS).
+  </Accordion>
+  <Accordion title="Controller not recognized by PC after flashing">
+    If the board reboots after flashing but your computer does not recognize it as a gamepad:
+
+    1. **Wait a few seconds.** USB enumeration can take a moment, especially on first connection.
+    2. **Unplug and replug.** Disconnect and reconnect the USB cable without holding any buttons.
+    3. **Check the USB mode.** GP2040-CE defaults to XInput mode. On Windows, XInput controllers appear as "Xbox 360 Controller" in Device Manager. They will not appear in the DirectInput game controller list. Use `joy.cpl` (Run → `joy.cpl`) to confirm a DirectInput/HID controller is recognized.
+    4. **Verify the correct firmware was flashed.** Flashing a firmware built for a different board will still boot, but the USB descriptor may behave unexpectedly.
+    5. **Try a different USB port or computer.** Rules out host-side USB issues.
+  </Accordion>
+</AccordionGroup>

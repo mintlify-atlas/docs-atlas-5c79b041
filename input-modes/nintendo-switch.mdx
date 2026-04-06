@@ -1,0 +1,92 @@
+---
+title: 'Nintendo Switch mode'
+description: 'Nintendo Switch input mode in GP2040-CE. Covers compatibility, button mapping, Switch Pro mode, D-pad behavior, and latency.'
+---
+
+GP2040-CE supports two Switch-specific input modes. Both enumerate as a Nintendo Switch Pro Controller. No authentication or special hardware is required — the controller is recognized immediately on any Switch hardware.
+
+<Note>
+Switch mode is one of the easiest modes to set up. Plug in the controller and it works. No keys, dongles, or additional configuration are needed.
+</Note>
+
+## Modes
+
+| Mode | Enum value | Description |
+|---|---|---|
+| Nintendo Switch | `INPUT_MODE_SWITCH` (1) | Standard Switch Pro Controller emulation |
+| Switch Pro | `INPUT_MODE_SWITCH_PRO` (15) | Enhanced compatibility variant |
+
+Both modes use the same HID report format and button mapping. `INPUT_MODE_SWITCH_PRO` is available for cases where the standard Switch mode has compatibility issues with specific games or docks.
+
+## Compatibility
+
+| Hardware | Status |
+|---|---|
+| Nintendo Switch | Supported |
+| Nintendo Switch OLED | Supported |
+| Nintendo Switch Lite | Supported |
+| Nintendo Switch 2 | Supported (via Switch Pro Controller compatibility) |
+| PC (via Switch HID driver) | Supported on Windows, Linux, macOS |
+
+## Activating Switch mode
+
+<Steps>
+  <Step title="Set via web configurator">
+    Open the GP2040-CE web configurator, go to **Settings → Input Mode**, and select **Nintendo Switch** or **Switch Pro**. Save and reboot.
+  </Step>
+  <Step title="Or assign a boot hotkey">
+    In **Settings → Boot Input Mode**, assign the Switch mode to a button. Hold that button while plugging in the controller to start in Switch mode.
+  </Step>
+</Steps>
+
+## Button mapping
+
+The Switch button layout differs from PlayStation conventions. Notably, the A and B buttons, and the X and Y buttons, are swapped relative to their physical positions compared to a PlayStation controller.
+
+| GP2040-CE | Switch label | Physical position |
+|---|---|---|
+| B1 | B | Bottom face button |
+| B2 | A | Right face button |
+| B3 | Y | Left face button |
+| B4 | X | Top face button |
+| L1 | L | Left shoulder |
+| R1 | R | Right shoulder |
+| L2 | ZL | Left trigger |
+| R2 | ZR | Right trigger |
+| S1 | Minus | Left center button |
+| S2 | Plus | Right center button |
+| A1 | Home | Home button |
+| A2 | Capture | Capture / screenshot button |
+| L3 | LS | Left stick click |
+| R3 | RS | Right stick click |
+
+<Note>
+The Switch face button layout means that B1 (bottom) maps to B, not A. If you are used to PlayStation or XInput layouts, expect Cross/A at the bottom position to map to the Switch B button. This is intentional and matches how Nintendo designed the Pro Controller.
+</Note>
+
+## D-pad behavior
+
+The Switch driver reports D-pad inputs as a hat switch value. All eight cardinal and diagonal directions are supported. D-pad mode can be changed to left or right analog stick emulation via a hotkey or the web configurator, in the same way as other modes.
+
+## Analog triggers
+
+ZL and ZR (L2 and R2) are reported as digital buttons in the Switch HID report — the Switch Pro Controller does not have analog triggers. If the board has analog trigger hardware, any non-zero analog trigger value will be reported as the button being pressed.
+
+## Analog sticks
+
+Left and right analog sticks are reported as 8-bit axes (0–255) with 128 as the center value. The Switch driver maps the internal 16-bit axis values directly.
+
+## Latency
+
+The Switch HID profile achieves approximately **0.72ms average input latency** at the Switch's polling rate. Reports are sent only when inputs change, minimizing unnecessary USB traffic.
+
+## Known differences from a real Pro Controller
+
+- No accelerometer or gyroscope data (unless a motion sensor add-on is present).
+- No NFC.
+- No HD Rumble — basic rumble output reports are accepted but may not be passed to actuators depending on hardware.
+- The Switch Home and Capture buttons work normally.
+
+<Tip>
+If a game does not respond to inputs, try switching between `INPUT_MODE_SWITCH` and `INPUT_MODE_SWITCH_PRO`. Some games or accessories have compatibility quirks with specific Pro Controller descriptors.
+</Tip>

@@ -1,0 +1,135 @@
+---
+title: RGB LEDs
+description: GP2040-CE supports WS2812B (NeoPixel) RGB LEDs for per-button reactive lighting, player indicator LEDs, and ambient case RGB, all driven from a single data pin.
+---
+
+The NeoPicoLED add-on drives WS2812B-compatible addressable RGB LEDs via a single data pin using the RP2040's PIO peripheral. All LEDs—button LEDs, player indicator LEDs (PLEDs), a turbo LED, and case ambient LEDs—share the same data line and are addressed by index position in the LED strip.
+
+<Note>
+  This add-on is enabled automatically when a valid **LED Data Pin** is configured in LED settings. There is no separate toggle for it in Add-ons Config.
+</Note>
+
+## LED data pin
+
+Set the LED data pin under **LED Configuration** (not Add-ons Config). Any GPIO pin that is not already assigned to another function can be used.
+
+## LED format
+
+The LED format controls the byte order sent to the LED strip. Select the format that matches your hardware:
+
+| Value | Description |
+|-------|-------------|
+| `GRB` (default) | Green-Red-Blue — used by most WS2812B strips |
+| `RGB` | Red-Green-Blue |
+| `GRBW` | Green-Red-Blue-White — for RGBW strips (SK6812) |
+| `RGBW` | Red-Green-Blue-White — for RGBW strips |
+
+## Button LED layout
+
+Button LED positions are assigned by index. Each button (Up, Down, Left, Right, B1–B4, L1, L2, R1, R2, S1, S2, L3, R3, A1, A2) has an index field that specifies where its LED sits in the strip. Setting an index to `-1` means the button has no LED.
+
+The **LEDs per button** setting allows multiple LEDs to be assigned to each button position (e.g., 2 LEDs per button for a larger illuminated area).
+
+## Animation effects
+
+The button LED animation is selected from the `AnimationEffects` enum:
+
+| Effect | Description |
+|--------|-------------|
+| **Static Color** | All button LEDs display the same fixed color |
+| **Rainbow** | All LEDs cycle through the color spectrum together |
+| **Chase** | A color sweeps around the button LEDs in sequence |
+| **Static Theme** | Each button has an individually assigned color from a preset theme |
+| **Custom Theme** | Each button has two individually assigned colors — one for idle, one for pressed |
+
+Animation hotkeys are available via controller input (hold S1+S2, then press a face button) to cycle effects and adjust brightness and speed in real time.
+
+## Brightness control
+
+| Field | Description |
+|-------|-------------|
+| **Maximum Brightness** | Upper brightness limit (0–255). Default: 128. |
+| **Brightness Steps** | Number of steps in the brightness ladder for hotkey adjustment |
+
+## Player indicator LEDs (PLED)
+
+Player indicator LEDs show which player number the host console has assigned. They can be either PWM-driven individual LEDs or NeoPixel LEDs in the main strip.
+
+| Type | Description |
+|------|-------------|
+| `PLED_TYPE_NONE` | No player LEDs |
+| `PLED_TYPE_PWM` | Four individual GPIO-driven LEDs (pin-based) |
+| `PLED_TYPE_RGB` | Four NeoPixel LEDs in the strip (index-based) |
+
+For RGB PLEDs, configure four index values (`pledIndex1`–`pledIndex4`) that point to LED positions in the strip. The PLED color is shared across all four indicators.
+
+Player LED behavior adapts to the active input mode:
+- **XInput**: Follows Xbox controller quadrant patterns (rotate, blink, solid)
+- **PS3**: Maps to PS3 LED patterns
+- **PS4/PS5**: Follows DualShock 4 lightbar blink timing
+- **Switch Pro**: Maps to Switch player indicator patterns
+- **Xbox One**: Solid on for player 1
+
+## Turbo indicator LED
+
+If the Turbo add-on is enabled and the LED type is set to RGB, a single NeoPixel in the strip acts as the turbo indicator. Configure its position with **Turbo LED Index** and its color with **Turbo LED Color**.
+
+## Case RGB (ambient lighting)
+
+Case RGB adds a secondary segment of LEDs to the strip, starting at a configurable index, for ambient or underglow lighting.
+
+### Case RGB types
+
+| Type | Description |
+|------|-------------|
+| `CASE_RGB_TYPE_NONE` | No case RGB |
+| `CASE_RGB_TYPE_AMBIENT` | Case LEDs run an independent ambient effect |
+| `CASE_RGB_TYPE_LINKED` | Case LEDs mirror and repeat the button LED animation |
+
+### Ambient effects
+
+When using the Ambient type, one of five effects can be selected (from the `AmbientEffectType` enum):
+
+| Effect | Description |
+|--------|-------------|
+| **Static Color** | All case LEDs display a single solid color from a 14-color palette |
+| **Gradient** | All case LEDs cycle through a smooth RGB color gradient |
+| **Chase** | A color chases around the case LED ring (4 LEDs lit at once) |
+| **Breathing** | All case LEDs pulse in brightness, cycling through colors |
+| **Custom Static** | Case LEDs display a repeating pattern from one of five preset color themes |
+
+Ambient effects can be adjusted at runtime using controller hotkeys (hold S2, then press L1/L2 to change effect, R1/R2 to change color, and Y/B to adjust brightness).
+
+### Linked mode
+
+In Linked mode, the case LEDs replicate the button LED animation. The button LED frame is tiled across the case LED count. If the case LED count is not an exact multiple of the button LED count, remaining positions use the beginning of the button LED frame.
+
+## Setup procedure
+
+<Steps>
+  <Step title="Wire the LED strip">
+    Connect the WS2812B data-in line to any free GPIO pin. Connect the strip to an appropriate 5V power source (not from the RP2040 GPIO pin itself).
+  </Step>
+  <Step title="Configure the data pin and format">
+    In the web configurator, go to **LED Configuration** and set the **LED Data Pin** and **LED Format** to match your strip.
+  </Step>
+  <Step title="Assign button LED indexes">
+    Enter the LED index for each button that has an LED. Indexes are 0-based and correspond to physical LED positions in the strip.
+  </Step>
+  <Step title="Select an animation">
+    Choose a base animation effect and set brightness values.
+  </Step>
+  <Step title="Configure player LEDs (optional)">
+    Set the PLED type to RGB and assign four LED indexes for player indicator positions.
+  </Step>
+  <Step title="Configure case RGB (optional)">
+    Set the Case RGB type, starting index, and LED count for the ambient LED segment.
+  </Step>
+  <Step title="Save">
+    Click **Save**. LEDs should illuminate immediately.
+  </Step>
+</Steps>
+
+<Info>
+  The LED strip runs at 10 ms intervals (100 Hz). If LEDs flicker or show incorrect colors, verify the LED format setting matches your strip's byte order.
+</Info>

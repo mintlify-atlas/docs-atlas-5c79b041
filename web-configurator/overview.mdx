@@ -1,0 +1,72 @@
+---
+title: 'Web configurator overview'
+description: 'The GP2040-CE web configurator is a browser-based interface served directly by the firmware over USB. Use it to configure input modes, pin mappings, LEDs, display settings, add-ons, and more without flashing new firmware.'
+---
+
+## What is the web configurator?
+
+The web configurator is a React application embedded in the GP2040-CE firmware. It runs as a web server over USB RNDIS (USB Ethernet), so no additional software installation is required. All configuration changes are saved to flash memory on the device.
+
+## Accessing the web configurator
+
+<Steps>
+  <Step title="Enter configuration mode">
+    Hold the **S2** button (the button mapped to `BUTTON_PRESS_S2`) while plugging the device into USB. The device will boot into configuration mode instead of its normal input mode.
+  </Step>
+  <Step title="Open a browser">
+    Navigate to [http://192.168.7.1](http://192.168.7.1) in any modern web browser. On some systems, the RNDIS driver must be installed first.
+
+    <Note>
+      On Windows, you may need to install the RNDIS driver manually if the device is not automatically recognized as a network adapter.
+    </Note>
+  </Step>
+  <Step title="Configure and save">
+    Make your changes in the web configurator. Click the **Save** button on each page to write settings to flash memory. Changes take effect immediately or after a reboot depending on the setting.
+  </Step>
+</Steps>
+
+<Warning>
+  Enabling **Forced Setup Mode** with the "Disable Web Config" or "Disable Both" option will prevent you from accessing the web configurator. To recover, use the Reset Settings page before enabling that option, or flash the firmware again.
+</Warning>
+
+## Available pages
+
+<CardGroup cols={2}>
+  <Card title="Pin mapping" icon="map-pin" href="/web-configurator/pin-mapping">
+    Assign GPIO pins (GP0–GP29) to button actions, D-pad directions, analog inputs, macros, and more. Supports up to 5 named profiles with independent pin maps.
+  </Card>
+  <Card title="Settings" icon="sliders" href="/web-configurator/settings">
+    Configure input mode (XInput, PS4, PS5, Switch, keyboard, and more), D-pad mode, SOCD cleaning, hotkeys, forced setup mode, and per-mode authentication options.
+  </Card>
+  <Card title="LED configuration" icon="lightbulb" href="/web-configurator/led-configuration">
+    Set up RGB LED data pin, LED format, button order, player LEDs (PWM or RGB), and case lighting. Control brightness, animation effects, and custom color themes.
+  </Card>
+  <Card title="Display configuration" icon="monitor" href="/web-configurator/display-configuration">
+    Configure an I2C OLED display (SSD1306/SH1106/SH1107). Set button layout, orientation, splash screen, display saver mode, contrast, and status indicators.
+  </Card>
+  <Card title="Add-ons" icon="puzzle-piece" href="/add-ons/overview">
+    Enable and configure optional add-on features: analog sticks, turbo, SOCD slider, dual directional input, keyboard host, macros, reactive LEDs, and many more.
+  </Card>
+  <Card title="Backup & restore" icon="database" href="/hardware/flashing">
+    Export the full device configuration as a JSON file, or import a previously exported configuration to restore settings or copy a config to another device.
+  </Card>
+</CardGroup>
+
+## Saving settings
+
+Each page in the web configurator has its own **Save** button. Settings are written to the device's flash memory and persist across power cycles.
+
+<Tip>
+  The home page shows the current firmware version, board configuration file name, and memory usage (flash and heap). If a newer firmware version is available, a download link is shown.
+</Tip>
+
+## System information
+
+The home page displays:
+
+- **Board label and UF2 filename** — identifies which board configuration is loaded
+- **Current firmware version** — the version running on the device
+- **Latest firmware version** — fetched from GitHub releases
+- **Architecture and build type** — useful for bug reports
+- **Flash usage** — how much of the board's flash memory is used by the firmware and configuration
+- **Heap usage** — runtime memory consumption

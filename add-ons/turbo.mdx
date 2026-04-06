@@ -1,0 +1,123 @@
+---
+title: Turbo
+description: The Turbo add-on automatically presses and releases assigned buttons at a configurable rate, enabling rapid-fire input without repeated physical presses.
+---
+
+The Turbo add-on implements rapid-fire input by toggling the state of selected buttons at a fixed interval. When a button is enabled for turbo and the player holds it, the firmware alternates between pressed and released at the configured shots-per-second rate. A dedicated turbo activation button selects which buttons receive the effect.
+
+## How turbo works
+
+1. A GPIO pin is assigned the `BUTTON_PRESS_TURBO` action in Pin Mapping.
+2. While the turbo pin is held, pressing any eligible button toggles that button's turbo state on or off.
+3. When a turbo-enabled button is held, the firmware flickers its state on/off at the rate set by **Shot Count**.
+4. The D-pad Up/Down inputs adjust the shot count by one step while the turbo pin is held.
+
+The turbo interval is calculated as:
+
+```
+interval_us = 1,000,000 / (shot_count × 2)
+```
+
+A shot count of 10 produces a 50 ms on / 50 ms off cycle (10 presses per second).
+
+## Eligible buttons
+
+Turbo can be applied to the following buttons:
+
+`B1`, `B2`, `B3`, `B4`, `L1`, `R1`, `L2`, `R2`
+
+L3 and R3 are also available as turbo targets from the SHMUP charge button assignment.
+
+## Configuration options
+
+### Shot count
+
+| Field | Range | Default | Description |
+|-------|-------|---------|-------------|
+| **Turbo Shot Count** | 2–30 | 5 | Number of button presses per second |
+
+The shot count can also be controlled at runtime via the turbo pin + D-pad Up/Down combination, or by a rotary encoder if one is connected and the encoder event is wired to `HOTKEY_TURBO_COUNT_UP` / `HOTKEY_TURBO_COUNT_DOWN`.
+
+### Turbo indicator LED
+
+An LED can display the current turbo state:
+
+- **Off**: No turbo buttons are enabled
+- **On**: One or more buttons have turbo enabled but are not being pressed
+- **Blinking**: A turbo-enabled button is being held (blinks in sync with turbo flicker)
+
+| Field | Description |
+|-------|-------------|
+| **LED Type** | `Off`, `PWM` (single GPIO), or `RGB` (NeoPixel index) |
+| **LED Pin** | GPIO pin for PWM LED output |
+| **LED Index** | NeoPixel LED index (0-based) when using RGB type |
+| **LED Color** | RGB color for the turbo LED when using RGB type |
+
+### SHMUP dial
+
+An analog dial connected to an ADC pin can replace the digital shot count setting. The ADC value is sampled every 100 ms and mapped to the 2–30 shots-per-second range automatically.
+
+| Field | Description |
+|-------|-------------|
+| **SHMUP Dial Pin** | ADC-capable GPIO pin (26–29) connected to the dial |
+
+## SHMUP mode
+
+SHMUP mode is designed for shoot-em-up (SHMUP) games that use a combination of held charge shots and rapid-fire shots on the same buttons. Enable it with the **SHMUP Mode** toggle.
+
+### Always-on turbo buttons
+
+Up to four buttons can be designated as always-on turbo, meaning they are permanently in turbo state without requiring the turbo pin to activate them:
+
+| Field | Description |
+|-------|-------------|
+| **Turbo-Button 1–4 (Always On)** | Button masks that are always in turbo mode |
+
+### Charge shot buttons
+
+Up to four additional physical pins act as charge shot inputs. Each pin is mapped to a gamepad button mask. When a charge pin is held, the corresponding button is injected into the gamepad state.
+
+| Field | Description |
+|-------|-------------|
+| **Charge Shot Pin 1–4** | GPIO pin for each physical charge button |
+| **Charge Shot Button Map 1–4** | Gamepad button the charge pin controls |
+
+### SHMUP mix mode
+
+Controls how the turbo flicker interacts with charge buttons:
+
+<AccordionGroup>
+  <Accordion title="Turbo Priority (default)">
+    When a button has both turbo enabled and a charge pin held, the turbo flicker takes effect. The button will rapid-fire even while the charge pin is pressed.
+  </Accordion>
+  <Accordion title="Charge Priority">
+    When a charge pin is held, the corresponding button is immune to turbo flicker. The button fires continuously while the charge pin is held, and only rapid-fires when the charge pin is released (if turbo is enabled for that button).
+  </Accordion>
+</AccordionGroup>
+
+## Setup procedure
+
+<Steps>
+  <Step title="Assign the turbo pin">
+    In the web configurator, go to **Pin Mapping** and assign one GPIO pin the action **Turbo**. This pin activates turbo assignment when held.
+  </Step>
+  <Step title="Enable the add-on">
+    Go to **Add-ons Config** and enable **Turbo Input**.
+  </Step>
+  <Step title="Set shot count">
+    Enter the desired **Turbo Shot Count** (2–30). A higher value fires faster.
+  </Step>
+  <Step title="Configure the indicator LED (optional)">
+    Select the LED type. For a PWM LED, enter the GPIO pin number. For an RGB LED, enter the NeoPixel index and choose a color.
+  </Step>
+  <Step title="Enable SHMUP mode (optional)">
+    Toggle **SHMUP Mode** and configure always-on buttons, charge pins, and the mix mode if needed.
+  </Step>
+  <Step title="Save">
+    Click **Save**. Hold the turbo pin and press buttons to toggle their turbo state.
+  </Step>
+</Steps>
+
+<Tip>
+  While the turbo pin is held, press D-pad Up or Down to increase or decrease the shot count by one step. The new count is saved to storage automatically.
+</Tip>

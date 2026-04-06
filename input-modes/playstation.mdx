@@ -1,0 +1,196 @@
+---
+title: 'PlayStation modes'
+description: 'PS3, PS4, and PS5 input modes in GP2040-CE. Covers authentication methods, controller types, button mapping, and setup steps for console use.'
+---
+
+GP2040-CE supports PlayStation 3, PlayStation 4, and PlayStation 5 input modes. PS3 requires no authentication and works natively. PS4 and PS5 require authentication credentials or a USB dongle to function on console hardware.
+
+<Warning>
+PS4 and PS5 modes without authentication work as a generic HID gamepad on PC only. To use these modes on a PS4 or PS5 console, you must configure an authentication method.
+</Warning>
+
+## Button mapping
+
+All PlayStation modes share the same button label mapping:
+
+| GP2040-CE | PlayStation label |
+|---|---|
+| B1 | Cross |
+| B2 | Circle |
+| B3 | Square |
+| B4 | Triangle |
+| L1 | L1 |
+| R1 | R1 |
+| L2 | L2 |
+| R2 | R2 |
+| S1 | Select (PS3) / Share (PS4) / Create (PS5) |
+| S2 | Start (PS3) / Options (PS4/PS5) |
+| A1 | Home / PS button |
+| A2 | Touchpad click |
+| L3 | L3 (left stick click) |
+| R3 | R3 (right stick click) |
+
+## PS3 mode
+
+`INPUT_MODE_PS3` (value 2) enumerates as a DualShock 3 / SIXAXIS controller. It uses a standard USB HID profile and requires no authentication handshake.
+
+**Compatibility:** Works natively on PS3, and on PC via any HID-compatible driver. Most PC games that support DirectInput will recognize the PS3 HID profile.
+
+**Features:**
+- Full analog stick support
+- Analog pressure-sensitive face buttons and triggers
+- Accelerometer and gyroscope data fields (populated if a sensor add-on is present)
+- Player LED assignment via output report
+
+**Device types supported:** Gamepad, Alternative Gamepad, Wheel, Guitar, Drums.
+
+<Note>
+PS3 mode is the simplest PlayStation mode to set up — just select it in the web configurator and plug in. No keys or dongles are needed.
+</Note>
+
+## PS4 mode
+
+`INPUT_MODE_PS4` (value 4) enumerates as a DualShock 4 or a supported PS4 peripheral. It requires authentication to work on a PS4 console.
+
+### Authentication methods
+
+Authentication is configured in **Settings → PS4 Auth Type**:
+
+<Tabs>
+  <Tab title="None (PC only)">
+    No authentication is performed. The controller works as a standard HID gamepad on PC but will not pass PS4 console security checks.
+
+    ```
+    INPUT_MODE_AUTH_TYPE_NONE = 0
+    ```
+  </Tab>
+  <Tab title="Keys (RSA private key)">
+    Upload a PS4 private key, serial number, and signature file via the web configurator. The firmware signs authentication nonces using the embedded key.
+
+    ```
+    INPUT_MODE_AUTH_TYPE_KEYS = 1
+    ```
+
+    Files required:
+    - Private key (PEM format, 2048-bit RSA)
+    - Serial number (16 hex characters)
+    - Signature file (256 bytes)
+  </Tab>
+  <Tab title="USB dongle passthrough">
+    A PS4 authentication dongle (e.g. a licensed PS4 controller) is connected to the GP2040-CE USB host port. The firmware passes authentication challenges between the PS4 console and the dongle.
+
+    ```
+    INPUT_MODE_AUTH_TYPE_USB = 2
+    ```
+
+    Requires the USB host peripheral to be enabled and a compatible dongle connected.
+  </Tab>
+  <Tab title="I2C">
+    Authentication data is sourced from a device connected via I2C.
+
+    ```
+    INPUT_MODE_AUTH_TYPE_I2C = 3
+    ```
+  </Tab>
+</Tabs>
+
+### Setting up RSA key authentication
+
+<Steps>
+  <Step title="Obtain your PS4 key files">
+    You need a valid PS4 RSA private key (PEM format), a 16-character serial number, and a 256-byte signature file. These must come from a licensed PS4 controller.
+  </Step>
+  <Step title="Open the web configurator">
+    Connect the controller to a PC and open the GP2040-CE web configurator.
+  </Step>
+  <Step title="Select PS4 mode and Keys authentication">
+    Go to **Settings → Input Mode**, select **PS4**, then set **Auth Type** to **Keys**.
+  </Step>
+  <Step title="Upload the key files">
+    In the PS4 key upload section, select your private key file, serial file, and signature file. Click **Verify and Save**.
+  </Step>
+  <Step title="Confirm the upload">
+    The web configurator will verify the private key by performing a test signature. If the key is valid, it is stored on the device.
+  </Step>
+  <Step title="Test on PS4">
+    Plug the controller into a PS4. It should enumerate as a recognized DualShock 4.
+  </Step>
+</Steps>
+
+### Controller types (PS4ControllerType)
+
+The PS4 driver supports multiple controller type identifiers, which change how the PS4 host categorizes the device:
+
+| Enum | Value | Description |
+|---|---|---|
+| `PS4_CONTROLLER` | 0 | Standard DualShock 4 gamepad |
+| `PS4_GUITAR` | 1 | Guitar controller |
+| `PS4_DRUMS` | 2 | Drum kit |
+| `PS4_WHEEL` | 6 | Racing wheel |
+| `PS4_ARCADESTICK` | 7 | Arcade stick (also used for PS5 compatibility) |
+| `PS4_HOTAS` | 8 | Hands-On Throttle And Stick (HOTAS) |
+
+The active controller type is determined by the **Input Device Type** setting in the web configurator.
+
+### Controller ID mode (PS4ControllerIDMode)
+
+| Mode | Value | Description |
+|---|---|---|
+| `PS4_ID_CONSOLE` | 0 | Reports licensed controller vendor/product IDs |
+| `PS4_ID_EMULATION` | 1 | Reports standard DualShock 4 (Sony) vendor/product IDs |
+
+Console mode uses the actual IDs for the selected device type (e.g. a specific arcade stick VID/PID). Emulation mode always reports as a standard DualShock 4.
+
+### Touchpad emulation
+
+In gamepad mode, pressing A2 (touchpad button) emulates a single-finger touchpad press at the center of the touchpad. If A3 is also pressed, the touch position shifts left; if A4 is pressed, it shifts right.
+
+### Latency
+
+PS4 mode targets sub-1ms input report latency. The driver sends a report every time inputs change, and also sends a keep-alive report approximately every 5ms to maintain compatibility with games that require frequent updates.
+
+## PS5 mode
+
+`INPUT_MODE_PS5` (value 13) uses the same PS4 HID driver but presents a different controller configuration to the host. The PS5 requires the controller to authenticate and advertise as a supported peripheral type.
+
+**Default controller type for PS5:** `PS4_ARCADESTICK` (value 7). This is the type that allows arcade sticks and fight pads to work on PS5 without a separate PS5 license.
+
+### Authentication
+
+PS5 authentication follows the same method as PS4 but uses a separate auth type field (`ps5AuthType`):
+
+| Auth type | Value | Description |
+|---|---|---|
+| `INPUT_MODE_AUTH_TYPE_NONE` | 0 | PC only, no console support |
+| `INPUT_MODE_AUTH_TYPE_USB` | 2 | USB dongle passthrough |
+
+<Note>
+PS5 mode via USB dongle passthrough is the most common setup for arcade stick use on PS5. A licensed PS5 controller (or a licensed PS4 controller with PS5 compatibility) is connected to the USB host port.
+</Note>
+
+### PS5 General mode
+
+`INPUT_MODE_P5GENERAL` (value 16) is a non-authenticated PS5 HID mode intended for PC use only. It does not attempt authentication and will not work on PS5 console hardware.
+
+### Latency
+
+PS5 mode targets the same sub-1ms latency as PS4 mode, using the same keep-alive mechanism.
+
+## Device subtypes
+
+PS3 and PS4/PS5 modes support multiple device subtypes:
+
+<AccordionGroup>
+  <Accordion title="Guitar">
+    Fret buttons, whammy bar, pickup selector, and tilt axis are mapped to dedicated fields in the HID report. Standard face buttons also trigger when frets are pressed.
+  </Accordion>
+  <Accordion title="Drums">
+    Drum pads (Red, Blue, Yellow, Green) and cymbals (Yellow, Blue, Green) report velocity values. Kick pedal inputs map to L1/R1 buttons.
+  </Accordion>
+  <Accordion title="Wheel">
+    Steering wheel, gas pedal, brake pedal, and clutch pedal axes are supported. Shifter gear position is tracked and reported.
+  </Accordion>
+  <Accordion title="HOTAS (PS4 only)">
+    Joystick axes, rudder/twist, throttle, rocker switch, and pedal axes are supported.
+  </Accordion>
+</AccordionGroup>

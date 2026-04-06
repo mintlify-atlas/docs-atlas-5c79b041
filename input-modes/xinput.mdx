@@ -1,0 +1,130 @@
+---
+title: 'XInput mode'
+description: 'XInput (Xbox 360 / Xbox One compatible) input mode in GP2040-CE. Covers compatibility, button mapping, player LEDs, D-pad modes, and Xbox One differences.'
+---
+
+XInput is the recommended mode for PC gaming. The controller enumerates as an Xbox 360-compatible gamepad using Microsoft's XInput protocol. No additional drivers are needed on Windows 10 and later.
+
+<Note>
+XInput works on Windows without additional drivers. Linux and macOS also support XInput controllers natively through the `xpad` kernel module and IOKit respectively.
+</Note>
+
+## Compatibility
+
+| Platform | Status |
+|---|---|
+| Windows 10 / 11 | Plug-and-play, no drivers required |
+| Steam Deck (SteamOS) | Supported natively |
+| Android (USB OTG) | Supported on most devices |
+| Linux | Supported via `xpad` kernel module |
+| macOS | Supported with third-party driver (e.g. 360Controller) |
+
+## Activating XInput mode
+
+<Steps>
+  <Step title="Set via web configurator">
+    Open the GP2040-CE web configurator, go to **Settings → Input Mode**, and select **XInput**. Save and reboot.
+  </Step>
+  <Step title="Or assign a boot hotkey">
+    In **Settings → Boot Input Mode**, assign **XInput** to a button (e.g. B1). Hold that button while plugging in the controller to start in XInput mode.
+  </Step>
+</Steps>
+
+## Button mapping
+
+| GP2040-CE | XInput (Xbox) |
+|---|---|
+| B1 | A |
+| B2 | B |
+| B3 | X |
+| B4 | Y |
+| L1 | LB (left bumper) |
+| R1 | RB (right bumper) |
+| L2 | LT (left trigger) |
+| R2 | RT (right trigger) |
+| S1 | Back / View |
+| S2 | Start / Menu |
+| A1 | Guide (Home) |
+| L3 | LS (left stick click) |
+| R3 | RS (right stick click) |
+| D-pad Up | D-pad Up |
+| D-pad Down | D-pad Down |
+| D-pad Left | D-pad Left |
+| D-pad Right | D-pad Right |
+
+## D-pad modes
+
+The D-pad can operate in three modes, configurable in the web configurator or via hotkey:
+
+| Mode | Behavior |
+|---|---|
+| Digital (default) | D-pad inputs are reported as discrete directional buttons |
+| Left analog | D-pad inputs are mapped to left analog stick axes |
+| Right analog | D-pad inputs are mapped to right analog stick axes |
+
+D-pad mode can be switched at runtime using a configured hotkey combination without rebooting.
+
+## Analog triggers
+
+L2 and R2 report as analog triggers (0–255 range). If the hardware does not have analog trigger sensors, pressing L2 or R2 sends the maximum value (0xFF). Hardware with analog trigger inputs reports the full analog range.
+
+## Player LED indicators
+
+When connected to a host that supports XInput player assignment (Windows, Xbox consoles via adapter), the host sends a player LED command. GP2040-CE maps these to player IDs 1–4:
+
+| LED pattern | Player |
+|---|---|
+| `XINPUT_PLED_ON1` | Player 1 |
+| `XINPUT_PLED_ON2` | Player 2 |
+| `XINPUT_PLED_ON3` | Player 3 |
+| `XINPUT_PLED_ON4` | Player 4 |
+
+If the board has addressable LEDs configured for player ID display, they will reflect the assigned player number.
+
+## Rumble
+
+The host can send rumble commands specifying left and right motor intensities. GP2040-CE passes these to any configured haptic actuators.
+
+## Xbox One (XBONE) mode
+
+`INPUT_MODE_XBONE` (value 5) is a separate mode that uses the Xbox One's XGIP protocol instead of the Xbox 360 XInput protocol. Key differences:
+
+<AccordionGroup>
+  <Accordion title="Authentication requirement">
+    Xbox One mode requires a USB host peripheral connected to the GP2040-CE board. The firmware passes authentication challenges between the host (console or PC) and the dongle. Without a dongle, the controller will not send input until authentication completes. Xbox One mode is disabled in the web configurator if the USB host peripheral is not available.
+  </Accordion>
+  <Accordion title="Protocol differences">
+    Xbox One uses the XGIP (Xbox Game Input Protocol) over a vendor-specific USB interface. The firmware sends an announce packet on connection, waits for a descriptor request, then proceeds through the auth handshake before reporting inputs.
+  </Accordion>
+  <Accordion title="Keep-alive packets">
+    The firmware sends a keep-alive packet every 15 seconds to maintain the connection. This is not required in standard XInput mode.
+  </Accordion>
+  <Accordion title="Guide button handling">
+    The Guide button in Xbox One mode is sent as a virtual keycode event rather than a regular input report bit.
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+Xbox One mode (`INPUT_MODE_XBONE`) requires the USB host peripheral to be enabled and a compatible authentication dongle connected. Without it, the controller will connect but not send input.
+</Warning>
+
+## XInput authentication (PC/Xbox)
+
+XInput mode supports optional USB passthrough authentication (`INPUT_MODE_AUTH_TYPE_USB`). When enabled, the firmware forwards authentication challenges from the host to a connected Xbox authentication dongle, allowing the controller to pass Xbox security checks.
+
+<Info>
+Authentication is optional in XInput mode for PC use. Standard XInput on Windows works without any authentication. Authentication is only relevant if connecting to an Xbox console via an adapter that enforces it.
+</Info>
+
+## Device subtypes
+
+The XInput driver supports multiple device subtypes beyond the standard gamepad. The subtype is advertised in the USB configuration descriptor:
+
+| Subtype | Use case |
+|---|---|
+| Gamepad (default) | Standard fighting game controller |
+| Wheel | Racing wheel with steering, gas, and brake axes |
+| Guitar | Guitar Hero / Rock Band guitar controller |
+| Drums | Drum kit controller |
+
+The active subtype is selected in the web configurator under the input device type setting.

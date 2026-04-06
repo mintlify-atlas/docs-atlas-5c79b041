@@ -1,0 +1,307 @@
+---
+title: "Usage"
+description: "Learn how to switch input modes, change D-pad modes, configure SOCD cleaning, use hotkeys, and switch profiles on GP2040-CE."
+---
+
+This page covers the core runtime features of GP2040-CE: selecting input modes at startup, changing D-pad behavior, choosing an SOCD cleaning mode, using in-game hotkeys, and loading profiles.
+
+## Button naming scheme
+
+GP2040-CE uses a platform-neutral button naming scheme internally. Each button is assigned a label (B1, B2, S1, A1, etc.) that maps to the corresponding button on each supported platform.
+
+| GP2040-CE | XInput | Switch | PS3 / PS4 / PS5 | DInput | Arcade |
+| --------- | ------ | ------ | --------------- | ------ | ------ |
+| B1        | A      | B      | Cross           | 2      | K1     |
+| B2        | B      | A      | Circle          | 3      | K2     |
+| B3        | X      | Y      | Square          | 1      | P1     |
+| B4        | Y      | X      | Triangle        | 4      | P2     |
+| L1        | LB     | L      | L1              | 5      | P4     |
+| R1        | RB     | R      | R1              | 6      | P3     |
+| L2        | LT     | ZL     | L2              | 7      | K4     |
+| R2        | RT     | ZR     | R2              | 8      | K3     |
+| S1        | Back   | −      | Select          | 9      | Coin   |
+| S2        | Start  | +      | Start           | 10     | Start  |
+| L3        | LS     | LS     | L3              | 11     | LS     |
+| R3        | RS     | RS     | R3              | 12     | RS     |
+| A1        | Guide  | Home   | —               | 13     | —      |
+| A2        | —      | Capture| —               | 14     | —      |
+
+<Note>
+  The physical pin assigned to each button label is configurable in the [web configurator](/web-configurator/pin-mapping). The table above shows the logical output for each mode — not the physical layout of your controller.
+</Note>
+
+## Platform button mappings
+
+<Tabs>
+  <Tab title="XInput (Xbox / PC)">
+    | GP2040-CE | Xbox / XInput |
+    | --------- | ------------- |
+    | B1        | A             |
+    | B2        | B             |
+    | B3        | X             |
+    | B4        | Y             |
+    | L1        | LB (Left Bumper) |
+    | R1        | RB (Right Bumper) |
+    | L2        | LT (Left Trigger) |
+    | R2        | RT (Right Trigger) |
+    | S1        | Back / View   |
+    | S2        | Start / Menu  |
+    | L3        | LS (Left Stick Click) |
+    | R3        | RS (Right Stick Click) |
+    | A1        | Guide / Xbox Button |
+  </Tab>
+  <Tab title="PlayStation 3 / 4 / 5">
+    | GP2040-CE | PlayStation |
+    | --------- | ----------- |
+    | B1        | Cross (×)   |
+    | B2        | Circle (○)  |
+    | B3        | Square (□)  |
+    | B4        | Triangle (△)|
+    | L1        | L1          |
+    | R1        | R1          |
+    | L2        | L2          |
+    | R2        | R2          |
+    | S1        | Select / Create |
+    | S2        | Start / Options |
+    | L3        | L3          |
+    | R3        | R3          |
+    | A1        | PS / Home   |
+    | A2        | Touchpad    |
+  </Tab>
+  <Tab title="Nintendo Switch">
+    | GP2040-CE | Nintendo Switch |
+    | --------- | --------------- |
+    | B1        | B               |
+    | B2        | A               |
+    | B3        | Y               |
+    | B4        | X               |
+    | L1        | L               |
+    | R1        | R               |
+    | L2        | ZL              |
+    | R2        | ZR              |
+    | S1        | − (Minus)       |
+    | S2        | + (Plus)        |
+    | L3        | Left Stick      |
+    | R3        | Right Stick     |
+    | A1        | Home            |
+    | A2        | Capture         |
+  </Tab>
+  <Tab title="Keyboard / HID">
+    In Keyboard mode, each button is mapped to a key or mouse input. Default mappings are configurable in the [web configurator](/web-configurator/pin-mapping). Common defaults:
+
+    | GP2040-CE | Default key |
+    | --------- | ----------- |
+    | B1        | Z           |
+    | B2        | X           |
+    | B3        | C           |
+    | B4        | A           |
+    | L1        | S           |
+    | R1        | D           |
+    | L2        | Q           |
+    | R2        | E           |
+    | S1        | Backspace   |
+    | S2        | Enter       |
+    | Up        | Up arrow    |
+    | Down      | Down arrow  |
+    | Left      | Left arrow  |
+    | Right     | Right arrow |
+  </Tab>
+</Tabs>
+
+## Selecting an input mode at startup
+
+The active input mode is selected by holding one or more buttons while plugging in the controller. The button-to-mode assignments are configurable in the web configurator under **Settings** → **Boot Input Modes**.
+
+Default assignments on most boards:
+
+| Hold at startup | Input mode         |
+| --------------- | ------------------ |
+| B1              | XInput             |
+| B2              | Nintendo Switch    |
+| B3              | PS3                |
+| B4              | PS4                |
+| R2              | Keyboard / HID     |
+| S2              | Web configurator   |
+| S1 + S2 + Up    | BOOTSEL (USB flash)|
+
+<Info>
+  The selected mode is saved to flash and used as the default on all subsequent boots until changed. You do not need to hold the button every time.
+</Info>
+
+## D-pad modes
+
+The D-pad inputs (Up, Down, Left, Right) can be routed to three different outputs. You can switch between them using hotkeys during play — no restart required.
+
+| Mode             | Description                                             |
+| ---------------- | ------------------------------------------------------- |
+| Digital D-pad    | Standard directional pad output. Default mode.          |
+| Left analog stick| D-pad inputs are converted to left stick axis values.   |
+| Right analog stick| D-pad inputs are converted to right stick axis values. |
+
+Default hotkeys for D-pad mode (held during play, using **Fn** or a combo button per your config):
+
+| Hotkey action           | Description                        |
+| ----------------------- | ---------------------------------- |
+| `HOTKEY_DPAD_DIGITAL`   | Switch to digital D-pad output     |
+| `HOTKEY_DPAD_LEFT_ANALOG` | Switch to left analog stick      |
+| `HOTKEY_DPAD_RIGHT_ANALOG` | Switch to right analog stick    |
+
+<Note>
+  The exact button combination that triggers each hotkey is fully configurable in the web configurator under **Settings** → **Hotkeys**.
+</Note>
+
+## SOCD cleaning
+
+Simultaneous Opposite Cardinal Directions (SOCD) occurs when opposing directions (Up+Down or Left+Right) are pressed at the same time. GP2040-CE provides five cleaning modes that determine which output is sent in that case.
+
+<AccordionGroup>
+  <Accordion title="Up Priority (SOCD_MODE_UP_PRIORITY)">
+    - **Up + Down** = Up
+    - **Left + Right** = Neutral (no output)
+
+    This is the traditional "stickless" or "leverless" SOCD mode used in many fighting game communities. Up always wins over Down, and opposing horizontal inputs cancel each other out.
+  </Accordion>
+  <Accordion title="Neutral (SOCD_MODE_NEUTRAL)">
+    - **Up + Down** = Neutral (no output)
+    - **Left + Right** = Neutral (no output)
+
+    Both opposing pairs cancel to neutral. No direction is favored.
+  </Accordion>
+  <Accordion title="Second Input Priority / Last Win (SOCD_MODE_SECOND_INPUT_PRIORITY)">
+    - **Up then Down** = Down (last input wins)
+    - **Left then Right** = Right (last input wins)
+
+    The most recently pressed direction takes priority. Releasing the second input returns to the first. This mode is sometimes called "Last Win" or "Last Input Priority."
+  </Accordion>
+  <Accordion title="First Input Priority / First Win (SOCD_MODE_FIRST_INPUT_PRIORITY)">
+    - **Up then Down** = Up (first input holds)
+    - **Left then Right** = Left (first input holds)
+
+    The first direction pressed holds until it is released. Pressing the opposite direction while the first is held has no effect.
+  </Accordion>
+  <Accordion title="Bypass (SOCD_MODE_BYPASS)">
+    - **Up + Down** = both Up and Down sent simultaneously
+    - **Left + Right** = both Left and Right sent simultaneously
+
+    No cleaning is applied. Both directions are passed through to the host. This mode is not available in PS3, PS4, or Nintendo Switch input modes — those modes automatically fall back to Neutral when Bypass is selected.
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+  Some tournaments and platforms have rules that restrict certain SOCD cleaning modes. Check the rules for your event before competing.
+</Warning>
+
+### Switching SOCD mode via hotkey
+
+SOCD mode can be changed during play using hotkeys without rebooting. The available hotkey actions are:
+
+| Hotkey action              | SOCD mode set                 |
+| -------------------------- | ----------------------------- |
+| `HOTKEY_SOCD_UP_PRIORITY`  | Up Priority                   |
+| `HOTKEY_SOCD_NEUTRAL`      | Neutral                       |
+| `HOTKEY_SOCD_LAST_INPUT`   | Second Input Priority (Last Win) |
+| `HOTKEY_SOCD_FIRST_INPUT`  | First Input Priority (First Win) |
+| `HOTKEY_SOCD_BYPASS`       | Bypass                        |
+
+## Hotkeys
+
+Hotkeys are button combinations you press during normal play to change settings on the fly. They do not send controller inputs to the host — the button presses are consumed by the firmware before being reported.
+
+Each hotkey consists of:
+- A combination of one or more buttons (B1–B4, L1/R1/L2/R2, S1/S2, A1/A2, and/or D-pad directions)
+- A target action from the `GamepadHotkey` enum
+
+Hotkeys are configured in the web configurator under **Settings** → **Hotkeys**. You can assign any button combination to any supported action. Up to 16 hotkey slots are available.
+
+### Available hotkey actions
+
+| Action                          | Description                                      |
+| ------------------------------- | ------------------------------------------------ |
+| `HOTKEY_DPAD_DIGITAL`           | Switch D-pad to digital output                   |
+| `HOTKEY_DPAD_LEFT_ANALOG`       | Switch D-pad to left analog stick                |
+| `HOTKEY_DPAD_RIGHT_ANALOG`      | Switch D-pad to right analog stick               |
+| `HOTKEY_HOME_BUTTON`            | Emulate the Home/Guide/PS button                 |
+| `HOTKEY_CAPTURE_BUTTON`         | Emulate the Capture/Screenshot button            |
+| `HOTKEY_SOCD_UP_PRIORITY`       | Set SOCD mode to Up Priority                     |
+| `HOTKEY_SOCD_NEUTRAL`           | Set SOCD mode to Neutral                         |
+| `HOTKEY_SOCD_LAST_INPUT`        | Set SOCD mode to Last Input (Second Input Priority) |
+| `HOTKEY_SOCD_FIRST_INPUT`       | Set SOCD mode to First Input Priority            |
+| `HOTKEY_SOCD_BYPASS`            | Set SOCD mode to Bypass                          |
+| `HOTKEY_INVERT_X_AXIS`          | Invert the X axis                                |
+| `HOTKEY_INVERT_Y_AXIS`          | Invert the Y axis                                |
+| `HOTKEY_TOGGLE_4_WAY_MODE`      | Toggle 4-way (no diagonal) mode                  |
+| `HOTKEY_LOAD_PROFILE_1`–`_6`    | Load profile 1 through 6                         |
+| `HOTKEY_NEXT_PROFILE`           | Cycle to the next profile                        |
+| `HOTKEY_PREVIOUS_PROFILE`       | Cycle to the previous profile                    |
+| `HOTKEY_REBOOT_DEFAULT`         | Reboot the controller to the default mode        |
+| `HOTKEY_SAVE_CONFIG`            | Save the current configuration to flash          |
+| `HOTKEY_LEDS_BRIGHTNESS_UP/DOWN`| Increase or decrease LED brightness              |
+| `HOTKEY_LEDS_ANIMATION_UP/DOWN` | Cycle LED animation effects                      |
+| `HOTKEY_TURBO_COUNT_UP/DOWN`    | Increase or decrease turbo rate                  |
+| `HOTKEY_FOCUS_MODE_TOGGLE`      | Toggle Focus Mode (disables non-essential inputs)|
+| `HOTKEY_L3_BUTTON`              | Emulate L3 (left stick click)                    |
+| `HOTKEY_R3_BUTTON`              | Emulate R3 (right stick click)                   |
+
+<Tip>
+  If you want a hotkey to require the **Fn** button, configure `AUX_MASK_FUNCTION` in your board config or add the Fn button to the hotkey combination in the web configurator.
+</Tip>
+
+## Profiles
+
+GP2040-CE supports up to **6 independent profiles**. Each profile stores its own pin mapping, so you can have completely different button layouts, input modes, or SOCD settings per profile.
+
+Profiles are useful for:
+- Different games with different optimal button layouts
+- Sharing a controller between players with different hand preferences
+- Storing separate configs for different platforms
+
+### Switching profiles
+
+Profiles can be switched in two ways:
+
+1. **Hotkeys** — Assign `HOTKEY_LOAD_PROFILE_1` through `HOTKEY_LOAD_PROFILE_6` (or `HOTKEY_NEXT_PROFILE` / `HOTKEY_PREVIOUS_PROFILE`) to a button combination in the web configurator.
+2. **Web configurator** — Select the active profile from the **Settings** page.
+
+<Note>
+  Switching profiles reinitializes the GPIO pin assignments and any add-ons that use simple GPIO. The switch happens in under one polling cycle and is seamless during play.
+</Note>
+
+### Configuring profiles
+
+Profiles are managed in the [web configurator](/web-configurator/pin-mapping). Each profile has its own pin mapping page. Settings that are not profile-specific (such as LED configuration and peripheral settings) are shared across all profiles.
+
+## Reboot hotkeys
+
+Two special hotkey combinations are built into the firmware and are always active, regardless of the hotkey configuration:
+
+| Combination           | Action                                         |
+| --------------------- | ---------------------------------------------- |
+| S2 + B3 + B4 (hold 4s)| Reboot to web configurator (or back to gamepad if already in config mode) |
+| S1 + B3 + B4 (hold 4s)| Reboot to BOOTSEL mode for re-flashing        |
+
+<Warning>
+  These reboot hotkeys only activate after all buttons have been released for at least 50ms since boot. This prevents them from triggering accidentally during the input mode selection at startup.
+</Warning>
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Will my settings be saved if I unplug the controller?">
+    Yes. Settings are written to the RP2040's internal flash memory. All configuration — including the active input mode, SOCD mode, D-pad mode, pin mappings, and hotkeys — persists across power cycles.
+  </Accordion>
+  <Accordion title="Can I use GP2040-CE on PS5 without a special dongle?">
+    PS5 requires controller authentication. Without an authentication source (such as a licensed PS4 or PS5 controller connected via the USB host add-on), the controller will work in PS4 compatibility mode on PS5, not as a native PS5 controller. The USB host passthrough add-on enables full PS5 authentication.
+  </Accordion>
+  <Accordion title="What happens if I press conflicting hotkeys?">
+    Hotkeys are checked in order. The first matching hotkey in the list wins. If you have overlapping combinations, reorder them in the web configurator so the more specific combination appears first.
+  </Accordion>
+  <Accordion title="Can I map the same physical button to multiple actions?">
+    A single button can appear in multiple hotkey combinations (for example, S2 alone could be a hotkey, and S2 + B1 could be a different hotkey). However, each hotkey slot triggers only one action.
+  </Accordion>
+  <Accordion title="How do I reset all settings to defaults?">
+    From the web configurator, use **Settings** → **Reset Settings**. Alternatively, you can re-flash the firmware using BOOTSEL mode, which will reset all stored configuration to the board's defaults.
+  </Accordion>
+  <Accordion title="Does the SOCD mode apply to analog stick inputs?">
+    No. SOCD cleaning only applies to digital D-pad inputs. Analog stick outputs (when D-pad is routed to left or right analog) and hardware analog inputs (via the Analog Input add-on) are not subject to SOCD cleaning.
+  </Accordion>
+</AccordionGroup>

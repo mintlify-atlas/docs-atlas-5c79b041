@@ -1,0 +1,85 @@
+---
+title: USB host
+description: The Gamepad USB Host add-on connects a wired USB gamepad to the GP2040-CE device and passes its input through to the host system, enabling controller adapters and converters.
+---
+
+The Gamepad USB Host add-on puts the RP2040 into USB host mode, allowing a wired USB gamepad to be connected to the GP2040-CE device. Input from the connected controller is read by the firmware and merged into the GP2040-CE's own gamepad state before being reported to the host system.
+
+<Warning>
+  USB host mode requires dedicated hardware support. The RP2040 can implement USB host via PIO (programmable I/O), but this requires specific circuitry on the board—typically a USB connector with a D+ data pin and a 5V power enable pin. This add-on is only available on boards that expose a USB host peripheral. If your board does not support USB host, the **Enabled** toggle will not appear and a "USB host not enabled" message is displayed instead.
+</Warning>
+
+## Hardware requirements
+
+USB host operation requires:
+
+- A **USB host connector** (Type-A or Micro-B OTG) wired to the RP2040
+- A **D+ data pin** (D-) connected to the RP2040 GPIO (configured in Peripheral Settings)
+- A **5V power enable pin** to control VBUS power to the connected device (optional but recommended for power management)
+
+These are configured under **Peripheral Settings** → **USB** in the web configurator, not in the add-on settings. The add-on checks `PeripheralManager::isUSBEnabled(0)` at startup and is unavailable if USB host is not initialized.
+
+## Compatibility
+
+The Gamepad USB Host add-on is **not compatible** with the Keyboard/Mouse Host add-on. Only one USB host consumer can be active at a time.
+
+Supported pass-through controllers depend on the `GamepadUSBHostListener` implementation in the firmware. Common HID gamepads that follow the USB HID specification are generally supported. Proprietary protocols (e.g., Xbox Wireless, DualSense over BT) are not supported over USB host in this add-on.
+
+## How input pass-through works
+
+1. The RP2040 enumerates the connected USB device as a USB host.
+2. HID reports from the connected gamepad are received by `GamepadUSBHostListener`.
+3. The listener translates the received HID button states into GP2040-CE's internal gamepad state format.
+4. The translated inputs are merged into the outgoing HID report sent to the host system during the `preprocess` phase.
+
+The result is that the host system sees a single GP2040-CE device whose state reflects both the physical buttons on the GP2040-CE board and the inputs from the connected USB gamepad.
+
+## Configuration
+
+### Peripheral settings (required)
+
+Before enabling the add-on, configure the USB host peripheral:
+
+<Steps>
+  <Step title="Open Peripheral Settings">
+    In the web configurator, navigate to **Peripheral Settings**.
+  </Step>
+  <Step title="Enable USB host">
+    Under the **USB** block, enable the peripheral and set the **D+ Pin** to the GPIO pin connected to the USB data lines. Optionally set the **5V Enable Pin** for VBUS power control.
+  </Step>
+  <Step title="Save peripheral settings">
+    Click **Save**. The device will reinitialize with USB host support.
+  </Step>
+</Steps>
+
+### Add-on settings
+
+<Steps>
+  <Step title="Enable the add-on">
+    In the web configurator, go to **Add-ons Config**. If USB host hardware is detected, the **Gamepad USB Host** section will show an **Enabled** toggle. Enable it.
+  </Step>
+  <Step title="Save">
+    Click **Save**.
+  </Step>
+  <Step title="Connect a USB gamepad">
+    Plug a USB gamepad into the USB host connector on your board. The device will enumerate the connected controller and begin reading its input.
+  </Step>
+</Steps>
+
+## Use cases
+
+<AccordionGroup>
+  <Accordion title="Legacy controller adapter">
+    Use GP2040-CE as an adapter to connect an older or non-standard USB gamepad to a modern system. The GP2040-CE presents itself as a modern HID device (XInput, PS4, Switch, etc.) regardless of what the connected USB controller reports.
+  </Accordion>
+  <Accordion title="Simultaneous input from two controllers">
+    Combine physical button inputs from the GP2040-CE board itself with inputs from a connected USB gamepad. Both input sources are merged into a single report.
+  </Accordion>
+  <Accordion title="Protocol converter">
+    Convert a USB HID gamepad to a different output protocol by selecting a different input mode on the GP2040-CE device (e.g., connect a generic USB HID pad, output as XInput or Switch Pro).
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+  The USB host add-on processes input during the `preprocess` phase on every loop iteration. Input latency from the connected USB device adds to the total system latency. Latency is bounded by the connected device's USB polling rate (typically 8 ms for USB 1.1 HID devices).
+</Info>

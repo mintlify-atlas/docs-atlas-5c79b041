@@ -1,0 +1,205 @@
+---
+title: Building from source
+description: How to build the GP2040-CE firmware from source for any supported board using CMake and the Raspberry Pi Pico SDK.
+---
+
+GP2040-CE uses CMake as its build system and targets the RP2040 and RP2350 microcontrollers via the Raspberry Pi Pico SDK. Building from source lets you compile firmware for any supported board config, create custom board configs, and contribute changes back to the project.
+
+## Prerequisites
+
+Before building, install the following tools.
+
+<CardGroup cols={2}>
+  <Card title="Pico SDK 2.2.0+" icon="microchip">
+    The Raspberry Pi Pico SDK is required. GP2040-CE requires version 2.2.0 or later. The build will fail with an earlier version.
+  </Card>
+  <Card title="CMake 3.10+" icon="wrench">
+    CMake is the build system generator. Version 3.10 or later is required.
+  </Card>
+  <Card title="ARM GCC toolchain" icon="code">
+    The `arm-none-eabi-gcc` cross-compiler is required to build for the RP2040 and RP2350 targets.
+  </Card>
+  <Card title="Python 3 and Git" icon="terminal">
+    Python 3 is used by the SDK and build scripts. Git is required to clone the repo and initialize submodules.
+  </Card>
+</CardGroup>
+
+<Note>
+  Node.js and npm are also required to build the embedded web configurator. The CMake build invokes `npm ci` and `npm run build` automatically. Set the `SKIP_WEBBUILD=TRUE` environment variable to skip this step if you only need the firmware binary.
+</Note>
+
+## Build procedure
+
+<Steps>
+  <Step title="Clone the repository with submodules">
+    GP2040-CE uses Git submodules for libraries such as TinyUSB, Pico-PIO-USB, and others. Clone with `--recursive` to fetch them all at once.
+
+    ```bash
+    git clone --recursive https://github.com/OpenStickCommunity/GP2040-CE.git
+    cd GP2040-CE
+    ```
+
+    If you already cloned without `--recursive`, initialize the submodules manually:
+
+    ```bash
+    git submodule update --init --recursive
+    ```
+
+    <Info>
+      The CMake build will also run `git submodule update --init --recursive` automatically unless you set `SKIP_SUBMODULES=TRUE`.
+    </Info>
+  </Step>
+
+  <Step title="Set up the Pico SDK">
+    The build system locates the Pico SDK via the `PICO_SDK_PATH` environment variable.
+
+    <Tabs>
+      <Tab title="Linux / macOS">
+        ```bash
+        export PICO_SDK_PATH=/path/to/pico-sdk
+        ```
+
+        Add this line to your shell profile (`.bashrc`, `.zshrc`, etc.) to persist it across sessions.
+      </Tab>
+      <Tab title="Windows">
+        Set the environment variable in System Properties or in your current terminal session:
+
+        ```powershell
+        $env:PICO_SDK_PATH = "C:\path\to\pico-sdk"
+        ```
+
+        For a permanent setting, add it via **Settings > System > Advanced system settings > Environment Variables**.
+      </Tab>
+    </Tabs>
+
+    <Tip>
+      You can also clone the Pico SDK separately and point `PICO_SDK_PATH` to that directory. The CI workflow uses pico-sdk version 2.2.0.
+
+      ```bash
+      git clone --branch 2.2.0 https://github.com/raspberrypi/pico-sdk.git
+      cd pico-sdk && git submodule update --init
+      export PICO_SDK_PATH=$(pwd)
+      ```
+    </Tip>
+  </Step>
+
+  <Step title="Configure the build">
+    Create a build directory and run CMake. The `GP2040_BOARDCONFIG` variable selects the board config to build. It defaults to `Pico` if not set.
+
+    <Tabs>
+      <Tab title="Linux / macOS">
+        ```bash
+        mkdir build && cd build
+        cmake -DCMAKE_BUILD_TYPE=Release ..
+        ```
+
+        To build for a specific board config, pass `GP2040_BOARDCONFIG` as an environment variable:
+
+        ```bash
+        GP2040_BOARDCONFIG=Pico cmake -DCMAKE_BUILD_TYPE=Release ..
+        ```
+      </Tab>
+      <Tab title="Windows">
+        ```powershell
+        mkdir build; cd build
+        $env:GP2040_BOARDCONFIG = "Pico"
+        cmake -DCMAKE_BUILD_TYPE=Release ..
+        ```
+      </Tab>
+    </Tabs>
+
+    The available board configs are listed in the `configs/` directory. Some commonly used ones are shown below.
+
+    | `GP2040_BOARDCONFIG` value | Board |
+    |---|---|
+    | `Pico` | Raspberry Pi Pico |
+    | `PicoW` | Raspberry Pi Pico W |
+    | `Pico2` | Raspberry Pi Pico 2 |
+    | `PicoFightingBoard` | Pico Fighting Board |
+    | `RP2040AdvancedBreakoutBoard` | RP2040 Advanced Breakout Board |
+    | `OpenCore0` | Open_Core0 |
+    | `Blank` | Minimal blank template |
+
+    <Note>
+      You can also set `PICO_BOARD` (e.g., `pico`, `pico2`) and `PICO_PLATFORM` (e.g., `rp2040`, `rp2350`) environment variables to control the target hardware variant.
+    </Note>
+  </Step>
+
+  <Step title="Compile the firmware">
+    <Tabs>
+      <Tab title="Linux / macOS">
+        ```bash
+        cmake --build . --parallel $(nproc)
+        ```
+
+        Or use Make directly if you configured with the Make generator:
+
+        ```bash
+        make -j$(nproc)
+        ```
+      </Tab>
+      <Tab title="Windows">
+        ```powershell
+        cmake --build . --config Release --parallel
+        ```
+      </Tab>
+    </Tabs>
+
+    A successful build produces a `.uf2` file in the `build/` directory named after the project version and board config:
+
+    ```
+    build/GP2040-CE_<version>_<boardconfig>.uf2
+    ```
+
+    For example: `GP2040-CE_0.7.12_Pico.uf2`
+  </Step>
+
+  <Step title="Flash the firmware">
+    Put your RP2040 board into bootloader mode by holding the **BOOTSEL** button while connecting it via USB. It will appear as a USB mass storage device named `RPI-RP2`.
+
+    Copy the `.uf2` file to the drive:
+
+    ```bash
+    cp build/GP2040-CE_*_Pico.uf2 /media/$USER/RPI-RP2/
+    ```
+
+    The board will reboot automatically and the firmware will be running.
+  </Step>
+</Steps>
+
+## Building for different boards
+
+Change the `GP2040_BOARDCONFIG` value to switch between boards. You must reconfigure CMake when changing board configs because each config sets different compiler definitions and header search paths.
+
+```bash
+# Clean the build directory and reconfigure for a different board
+rm -rf build
+mkdir build && cd build
+GP2040_BOARDCONFIG=PicoFightingBoard cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake --build . --parallel $(nproc)
+```
+
+<Warning>
+  Do not reuse a build directory across different board configs without cleaning it first. Changing `GP2040_BOARDCONFIG` in an existing build directory can produce incorrect results.
+</Warning>
+
+## Skipping the web build
+
+The CMake configuration builds the embedded web configurator by default using Node.js and npm. If you do not have Node.js installed or want a faster build cycle, skip the web build:
+
+```bash
+SKIP_WEBBUILD=TRUE GP2040_BOARDCONFIG=Pico cmake -DCMAKE_BUILD_TYPE=Release ..
+```
+
+## Debug builds
+
+To enable a debug build with stack usage analysis and stack guard protection:
+
+```bash
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+cmake --build . --parallel $(nproc)
+```
+
+<Note>
+  Debug builds enable `-fstack-usage`, `-Wstack-usage=500`, and `PICO_USE_STACK_GUARDS`. Use these when diagnosing stack overflows or memory issues, not for production flashing.
+</Note>

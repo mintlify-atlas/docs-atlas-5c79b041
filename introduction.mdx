@@ -1,0 +1,137 @@
+---
+title: "Introduction"
+description: "GP2040-CE is open-source, multi-platform gamepad firmware for the Raspberry Pi Pico and other RP2040-based boards, combining ultra-low latency with a rich feature set."
+---
+
+GP2040-CE (Community Edition) is gamepad firmware for the Raspberry Pi Pico and other boards based on the RP2040 microcontroller. It combines multi-platform compatibility, sub-millisecond input latency, and extensive customization options — without sacrificing performance.
+
+## Supported platforms
+
+GP2040-CE works with all major gaming platforms out of the box. You switch between them by holding a button at startup — no re-flashing required.
+
+<CardGroup cols={2}>
+  <Card title="PC (XInput / DirectInput)" icon="desktop">
+    Full XInput and DirectInput (HID) support. Works with Steam, emulators, and all major PC games.
+  </Card>
+  <Card title="PlayStation 3 / 4 / 5" icon="gamepad">
+    PS3, PS4, and PS5 modes with authentication passthrough support via USB host add-on.
+  </Card>
+  <Card title="Nintendo Switch" icon="gamepad">
+    Standard Switch and Switch Pro controller modes. Compatible with Switch and Switch docks.
+  </Card>
+  <Card title="Xbox One" icon="gamepad">
+    Xbox One input mode with authentication support via passthrough.
+  </Card>
+  <Card title="Steam Deck" icon="gamepad">
+    Recognized as a standard controller in Steam Deck's desktop and gaming modes.
+  </Card>
+  <Card title="MiSTer FPGA" icon="microchip">
+    Optimized for MiSTer's USB input pipeline. Latency measured at 0.765ms average.
+  </Card>
+  <Card title="Android" icon="mobile">
+    Works as a standard HID gamepad over USB with Android devices.
+  </Card>
+  <Card title="Classic / Retro" icon="gamepad">
+    Additional modes for Neo Geo Mini, Mega Drive Mini, PC Engine Mini, Egret II Mini, Astro City Mini, PS Classic, and original Xbox.
+  </Card>
+</CardGroup>
+
+## Key features
+
+### 14+ input modes
+
+Select from XInput, Nintendo Switch, PS3, PS4, PS5, Xbox One, D-Input/HID, Keyboard, and legacy retro console modes. The active mode persists across reboots and is switchable at any time by holding a button during startup.
+
+### Ultra-low input latency
+
+GP2040-CE targets 1000 Hz (1 ms) USB polling by default. At that rate, average latency is **0.76ms in XInput mode** — competitive with dedicated competition-grade hardware.
+
+### Multiple SOCD cleaning modes
+
+Simultaneous Opposite Cardinal Directions (SOCD) inputs are handled by one of five configurable modes: Up Priority, Neutral, Second Input Priority (last input wins), First Input Priority (first input wins), and Bypass. See [SOCD cleaning](/usage#socd-cleaning) for details.
+
+### Analog stick emulation
+
+D-pad inputs can be routed to the left analog stick, right analog stick, or kept as a digital D-pad. Switching between modes is available as a hotkey during play.
+
+### Per-button RGB LEDs
+
+Each button position can be individually addressed with full RGB color via the NeoPixel (WS2812B) protocol. Multiple animation effects and custom themes are supported.
+
+### PWM player indicator LEDs
+
+XInput player indicator LEDs (1–4 player number lights) are supported via PWM output pins.
+
+### Built-in web configurator
+
+GP2040-CE hosts its own configuration interface over USB networking (RNDIS). No software to install — plug in, open a browser, and navigate to `http://192.168.7.1`. Full pin mapping, add-on configuration, LED settings, and more are available from any modern browser.
+
+### OLED / I2C display support
+
+128×64 monochrome displays using SSD1306, SH1106, or SH1107 controllers are supported. The display can show the active input mode, SOCD mode, D-pad mode, button states, and a custom startup splash screen.
+
+### Turbo with selectable speed
+
+Turbo mode rapidly toggles any mapped button at a configurable rate. Turbo state is reflected on a dedicated LED if one is wired.
+
+### Input macros
+
+Up to 6 macros can be programmed to fire multi-button sequences on a single button press, hold, or toggle.
+
+### Add-on system
+
+Optional hardware features are enabled as add-ons, including analog joystick inputs, SOCD slider switches, tilt inputs, Wii extension controllers, SNES controllers, rotary encoders, I2C GPIO expanders, and USB host passthrough for authentication dongles.
+
+### Up to 6 profiles
+
+Pin mappings and settings can be stored in up to 6 independent profiles. Profiles are switchable at runtime via hotkey without rebooting.
+
+## Performance
+
+Latency testing follows the methodology from [inputlag.science](https://inputlag.science/controller/methodology) at the default 1000 Hz polling rate.
+
+| Mode    | Min     | Max     | Avg     | Stdev   | % on time |
+| ------- | ------- | ------- | ------- | ------- | --------- |
+| XInput  | 0.45 ms | 1.28 ms | 0.76 ms | 0.24 ms | 98.48%    |
+| Switch  | 0.41 ms | 1.22 ms | 0.72 ms | 0.24 ms | 98.53%    |
+| HID USB | 0.42 ms | 1.25 ms | 0.73 ms | 0.24 ms | 98.52%    |
+| PS3     | 0.52 ms | 1.46 ms | 0.83 ms | 0.24 ms | 98.37%    |
+| PS4     | 0.55 ms | 2.33 ms | 0.90 ms | 0.32 ms | 98.19%    |
+| PS5     | 0.55 ms | 2.38 ms | 0.91 ms | 0.32 ms | 98.18%    |
+
+Results are from firmware v0.7.12. Full data is available in the [GP2040-CE latency test results](https://github.com/OpenStickCommunity/Site/raw/main/latency_testing/GP2040-CE_Firmware_Latency_Test_Results_v0.7.12.xlsx).
+
+<Note>
+  PS4 and PS5 modes have slightly higher latency due to the authentication handshake overhead. Latency is still well within competitive play tolerances.
+</Note>
+
+## Supported boards
+
+GP2040-CE ships pre-built firmware images for 50+ boards, including:
+
+- **Raspberry Pi Pico** and **Pico 2**
+- **Flatbox** Rev4, Rev5 (RGB, Southpaw, USB Passthrough), and Rev8
+- **OpenCore0**, OpenCore0 WASD, and OpenCore0 MIXUP
+- **RP2040 Advanced Breakout Board** and Mini Breakout Board (with USB Passthrough variants)
+- **Haute42 COSMO** series (X, XCat, XM Lite, XM Ultra, XX Analog)
+- **Mavercade** Rev1, Rev2, and Rev3
+- **Liatris**, **BentoBox**, **Granola**, **Granola Beacon**, and many more
+
+See [supported boards](/hardware/supported-boards) for the complete list.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Flash the firmware to your board in a few minutes.
+  </Card>
+  <Card title="Usage" icon="gamepad" href="/usage">
+    Learn input modes, SOCD cleaning, hotkeys, and profiles.
+  </Card>
+  <Card title="Web configurator" icon="sliders" href="/web-configurator/overview">
+    Configure pins, LEDs, and add-ons from your browser.
+  </Card>
+  <Card title="Add-ons" icon="puzzle-piece" href="/add-ons/overview">
+    Extend your controller with turbo, macros, RGB LEDs, and more.
+  </Card>
+</CardGroup>

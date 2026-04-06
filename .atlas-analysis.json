@@ -1,0 +1,103 @@
+{
+  "projectType": "general",
+  "projectName": "GP2040-CE",
+  "projectDescription": "Multi-platform gamepad firmware for the Raspberry Pi Pico and other RP2040 boards, featuring ultra-low latency, 14+ input modes, and a built-in web configurator.",
+  "theme": "aspen",
+  "primaryColor": "#e90b8b",
+  "lightColor": "#88345c",
+  "darkColor": "#ab0466",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "usage"
+            ]
+          },
+          {
+            "group": "Web Configurator",
+            "pages": [
+              "web-configurator/overview",
+              "web-configurator/pin-mapping",
+              "web-configurator/settings",
+              "web-configurator/led-configuration",
+              "web-configurator/display-configuration"
+            ]
+          },
+          {
+            "group": "Add-ons",
+            "pages": [
+              "add-ons/overview",
+              "add-ons/analog-input",
+              "add-ons/turbo",
+              "add-ons/socd-cleaning",
+              "add-ons/rgb-leds",
+              "add-ons/input-macros",
+              "add-ons/usb-host"
+            ]
+          },
+          {
+            "group": "Input Modes",
+            "pages": [
+              "input-modes/overview",
+              "input-modes/xinput",
+              "input-modes/playstation",
+              "input-modes/nintendo-switch",
+              "input-modes/keyboard"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Hardware",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "hardware/supported-boards",
+              "hardware/wiring",
+              "hardware/flashing"
+            ]
+          },
+          {
+            "group": "Building from Source",
+            "pages": [
+              "development/building",
+              "development/custom-board-config",
+              "development/contributing"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "14+ input modes including XInput, PS3/PS4/PS5, Nintendo Switch, Xbox One, and Keyboard",
+    "Ultra-low input latency averaging 0.76ms in XInput mode at 1000Hz polling",
+    "Multiple SOCD cleaning modes (Up Priority, Neutral, Second Input Priority, First Input Priority, Bypass)",
+    "Built-in web configurator accessible via browser — no software installation required",
+    "Per-button RGB LED support with multiple animation effects",
+    "Extensive add-on system for analog inputs, turbo, display, macros, USB host passthrough, and more",
+    "Support for 128x64 I2C OLED displays (SSD1306, SH1106, SH1107)",
+    "Compatible with PC, PS3, PS4, PS5, Nintendo Switch, Xbox One, Steam Deck, MiSTer, and Android",
+    "50+ supported hardware boards including Raspberry Pi Pico, FlatBox, OpenCore, and many more",
+    "Input macro system with configurable press, hold-repeat, and toggle modes"
+  ],
+  "publicApiSurface": [
+    "InputMode enum (XInput, Switch, PS3, PS4, PS5, XBone, Keyboard, HID, and more)",
+    "GpioAction enum (button mappings, D-pad, analog directions, macros, hotkeys)",
+    "SOCDMode enum (UP_PRIORITY, NEUTRAL, SECOND_INPUT_PRIORITY, FIRST_INPUT_PRIORITY, BYPASS)",
+    "GamepadHotkey enum (mode switching, SOCD, LED controls, profile loading)",
+    "ButtonLayout / ButtonLayoutRight enums (Stick, Stickless, Vewlix, Capcom, custom, and more)",
+    "Add-on modules: Analog, Turbo, SOCD Slider, Tilt, Reverse, Input Macro, Wii Extension, SNES, USB Host, Rotary Encoder, HE Trigger",
+    "Web Configurator REST API (pin mapping, settings, LED config, add-on config, backup/restore)",
+    "AnimationEffects enum (Static Color, Rainbow, Chase, Static Theme, Custom Theme)",
+    "DpadMode enum (Digital, Left Analog, Right Analog)",
+    "Display config: SplashMode, DisplaySaverMode, I2C display support"
+  ]
+}

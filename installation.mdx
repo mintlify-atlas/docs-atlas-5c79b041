@@ -1,0 +1,147 @@
+---
+title: "Installation"
+description: "Download a pre-built firmware image and flash GP2040-CE to your RP2040 board in minutes using the BOOTSEL drag-and-drop method."
+---
+
+This guide covers everything you need to install GP2040-CE on your RP2040 board. No special tools or software are required beyond a USB cable and a web browser.
+
+## Prerequisites
+
+Before you start, make sure you have:
+
+- An RP2040-based board (Raspberry Pi Pico, Pico 2, or any [supported board](/hardware/supported-boards))
+- A USB cable that supports data transfer (not charge-only)
+- A computer with a web browser
+
+<Warning>
+  Some USB cables only carry power and do not transfer data. If your board does not appear as a USB drive in the next steps, try a different cable.
+</Warning>
+
+## Step 1: Download the firmware
+
+<Steps>
+  <Step title="Go to the releases page">
+    Open the [GP2040-CE releases page](https://github.com/OpenStickCommunity/GP2040-CE/releases) on GitHub.
+  </Step>
+  <Step title="Find your board">
+    Expand the **Assets** section of the latest release. Each supported board has a dedicated `.uf2` file named after it — for example, `GP2040-CE_X.X.X_Pico.uf2` for the Raspberry Pi Pico.
+
+    <Tip>
+      If your board is not listed by name, check the [supported boards](/hardware/supported-boards) page for the correct file to use.
+    </Tip>
+  </Step>
+  <Step title="Download the .uf2 file">
+    Click the `.uf2` file for your board to download it. Save it somewhere easy to find, such as your desktop.
+  </Step>
+</Steps>
+
+## Step 2: Enter BOOTSEL mode
+
+The RP2040 has a built-in USB bootloader accessible by holding the **BOOTSEL** button while the board powers on. This puts the board into USB Mass Storage mode so you can copy firmware onto it.
+
+<Steps>
+  <Step title="Unplug the board">
+    Make sure the board is disconnected from USB before proceeding.
+  </Step>
+  <Step title="Hold BOOTSEL">
+    Locate the **BOOTSEL** button on your board. On the Raspberry Pi Pico it is the small white button on top of the board, near the USB connector.
+
+    Press and hold the **BOOTSEL** button.
+  </Step>
+  <Step title="Plug in via USB">
+    While continuing to hold **BOOTSEL**, plug the board into your computer via USB.
+  </Step>
+  <Step title="Release BOOTSEL">
+    Once the board is connected, release the **BOOTSEL** button. Your board should appear as a USB drive named **RPI-RP2** (or similar) on your computer.
+  </Step>
+</Steps>
+
+<Note>
+  Some boards have a **BOOT** button instead of **BOOTSEL** — these work identically. Others may require bridging two pads with a wire instead of pressing a button. Check your specific board's documentation if you are unsure.
+</Note>
+
+## Step 3: Flash the firmware
+
+<Steps>
+  <Step title="Open the RPI-RP2 drive">
+    In your file manager (Windows Explorer, Finder, or Files), open the **RPI-RP2** drive that appeared when you entered BOOTSEL mode.
+  </Step>
+  <Step title="Copy the .uf2 file">
+    Drag and drop (or copy and paste) the `.uf2` file you downloaded into the **RPI-RP2** drive.
+
+    The board will automatically reboot as soon as the file finishes copying. The drive will disappear from your file manager — this is expected and means the flash was successful.
+  </Step>
+</Steps>
+
+<Info>
+  You do not need to eject the drive before copying. The board handles the reboot itself once the file is received.
+</Info>
+
+## Step 4: Verify the installation
+
+After flashing, the board reboots into GP2040-CE. To confirm it is running correctly:
+
+<Steps>
+  <Step title="Check your operating system">
+    Your board should now appear as a gamepad or HID device in your OS. On Windows, check **Device Manager** under **Human Interface Devices**. On Linux, run `lsusb` to see it listed.
+  </Step>
+  <Step title="Open the web configurator (optional)">
+    To access the built-in web configurator:
+
+    1. Unplug the board from USB.
+    2. Hold the **S2** button (Start/+ button on most layouts) on your controller.
+    3. While holding **S2**, plug the board back in via USB.
+    4. Release **S2** once connected.
+    5. Open a browser and navigate to `http://192.168.7.1`.
+
+    The web configurator dashboard should load within a few seconds.
+
+    <Note>
+      The default web configurator button is **S2**, but this may differ on some board configurations. Check your board's documentation if `http://192.168.7.1` does not load.
+    </Note>
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="The board does not appear as an RPI-RP2 drive">
+    - Try a different USB cable. Charge-only cables are common and will not work.
+    - Try a different USB port on your computer.
+    - Make sure you are holding **BOOTSEL** before plugging in, not after.
+    - On some boards, the BOOTSEL button may be labeled **BOOT** or require bridging pads. Consult your board's hardware documentation.
+  </Accordion>
+  <Accordion title="The .uf2 file copies but nothing seems to happen">
+    - Wait a few seconds after the drive disappears — the board is rebooting.
+    - If the RPI-RP2 drive reappears, the file may be corrupt or for the wrong board. Download the correct `.uf2` for your board and try again.
+    - Make sure you downloaded the file for your specific board model.
+  </Accordion>
+  <Accordion title="The web configurator at http://192.168.7.1 is unreachable">
+    - Confirm you held **S2** (or the correct web config button for your board) before plugging in.
+    - Some operating systems may block RNDIS (USB networking) by default. On Windows, check **Device Manager** for a **USB Ethernet/RNDIS Gadget** device. If it shows an error, install the RNDIS driver.
+    - On macOS, you may need to install [HoRNDIS](https://joshuawise.com/horndis) to enable RNDIS support.
+    - Try accessing `http://192.168.7.1` from a different browser.
+    - Try disabling your VPN if one is active — VPNs can block access to local link addresses.
+  </Accordion>
+  <Accordion title="The board is not recognized as a gamepad">
+    - Unplug and replug the board without holding any buttons. This boots into the default input mode.
+    - Check that the firmware you flashed matches your board. Flashing the wrong firmware can result in incorrect pin mappings and missing functionality.
+    - If the board was previously flashed with different firmware, you may need to hold **S1 + S2 + Up** at boot to enter BOOTSEL mode and re-flash.
+  </Accordion>
+  <Accordion title="How do I re-enter BOOTSEL mode after flashing GP2040-CE?">
+    From within GP2040-CE, you can enter BOOTSEL mode by holding **S1 + S2 + Up** while plugging in the board. This is the equivalent of using the physical BOOTSEL button.
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+Now that your board is flashed and running:
+
+<CardGroup cols={2}>
+  <Card title="Usage" icon="gamepad" href="/usage">
+    Learn how to switch input modes, configure SOCD cleaning, and use hotkeys.
+  </Card>
+  <Card title="Web configurator" icon="sliders" href="/web-configurator/overview">
+    Map your pins, configure LEDs, and enable add-ons from your browser.
+  </Card>
+</CardGroup>

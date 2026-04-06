@@ -1,0 +1,191 @@
+---
+title: Contributing
+description: How to contribute to GP2040-CE through code, documentation, hardware configs, testing, and community participation.
+---
+
+GP2040-CE is an open-source community project and welcomes contributions of all kinds. Whether you are fixing a bug, adding a new add-on, submitting a board config, or improving the docs, your help is appreciated.
+
+## Ways to contribute
+
+<CardGroup cols={2}>
+  <Card title="Code contributions" icon="code">
+    Submit bug fixes, new features, add-ons, and driver improvements via pull request. The project is written in C/C++ (C11/C++17) targeting the RP2040 and RP2350.
+  </Card>
+  <Card title="Board configurations" icon="microchip">
+    Add support for new RP2040-based controller hardware by creating a board config. See [Custom board config](/development/custom-board-config) for the full process.
+  </Card>
+  <Card title="Documentation" icon="book-open">
+    Improve existing pages, fix inaccuracies, or document features that are not yet covered. Documentation improvements are just as valuable as code changes.
+  </Card>
+  <Card title="Testing and bug reports" icon="bug">
+    Test pre-release builds, reproduce reported issues, and open detailed bug reports at [GitHub Issues](https://github.com/OpenStickCommunity/GP2040-CE/issues).
+  </Card>
+  <Card title="Community participation" icon="users">
+    Join the [OpenStick GP2040-CE Discord](https://discord.gg/k2pxhke7q8) to discuss features, help other users, and stay informed about development.
+  </Card>
+  <Card title="Hardware testing" icon="wrench">
+    Own a controller board that is not yet supported? Test existing configs, report hardware quirks, or help validate pull requests on real hardware.
+  </Card>
+</CardGroup>
+
+## Pull request workflow
+
+<Steps>
+  <Step title="Fork and clone the repository">
+    Fork the repository on GitHub, then clone your fork locally:
+
+    ```bash
+    git clone --recursive https://github.com/<your-username>/GP2040-CE.git
+    cd GP2040-CE
+    ```
+  </Step>
+
+  <Step title="Create a feature branch">
+    Work on a dedicated branch rather than directly on `main`:
+
+    ```bash
+    git checkout -b feature/my-improvement
+    ```
+
+    Use a descriptive branch name that reflects the change (e.g., `fix/turbo-led-pin`, `feat/myboard-config`, `docs/analog-addon`).
+  </Step>
+
+  <Step title="Make your changes">
+    Follow the coding standards described below. Make sure to:
+
+    - Respect the coding style of the file(s) you are editing.
+    - Enforce the `.editorconfig` settings (most editors handle this automatically with an EditorConfig plugin).
+    - Keep commits focused. One logical change per commit makes review easier.
+  </Step>
+
+  <Step title="Build and test">
+    Build the firmware with your changes and test on real hardware where possible:
+
+    ```bash
+    mkdir build && cd build
+    GP2040_BOARDCONFIG=Pico cmake -DCMAKE_BUILD_TYPE=Release ..
+    cmake --build . --parallel $(nproc)
+    ```
+
+    See [Building from source](/development/building) for the full build setup.
+  </Step>
+
+  <Step title="Submit the pull request">
+    Push your branch to your fork and open a pull request against the `main` branch of `OpenStickCommunity/GP2040-CE`:
+
+    ```bash
+    git push origin feature/my-improvement
+    ```
+
+    In the pull request description:
+    - Explain what the change does and why.
+    - List any boards or configurations you tested on.
+    - Reference any related issues with `Fixes #123` or `Relates to #123`.
+
+    CI will automatically build all supported board configs against your PR.
+  </Step>
+</Steps>
+
+<Note>
+  Pull requests are reviewed by the maintainers. Please allow time for feedback and be ready to iterate. Smaller, focused PRs are reviewed faster than large, wide-ranging changes.
+</Note>
+
+## Coding standards
+
+### Language and standard
+
+- C source files use **C11** (`CMAKE_C_STANDARD 11`).
+- C++ source files use **C++17** (`CMAKE_CXX_STANDARD 17`).
+
+### File organization
+
+```
+GP2040-CE/
+├── headers/          # All header files (.h)
+│   ├── addons/       # Add-on headers
+│   ├── drivers/      # Driver headers
+│   ├── gamepad/      # Gamepad state and input headers
+│   └── display/      # Display and UI headers
+├── src/              # All implementation files (.cpp / .c)
+│   ├── addons/       # Add-on implementations
+│   ├── drivers/      # USB driver implementations
+│   └── display/      # Display subsystem
+└── configs/          # Board configuration directories
+```
+
+Place headers in the matching `headers/` subdirectory and implementations in `src/`. Follow the existing structure for the subsystem you are modifying.
+
+### Style conventions
+
+- Match the style of the file you are editing.
+- The `.editorconfig` at the project root defines indentation (spaces, not tabs in most files) and line endings.
+- Compiler warnings are enabled with `-Wall`, `-Wtype-limits`. Do not introduce new warnings.
+
+## Add-on architecture
+
+Add-ons are optional firmware modules that extend input handling. They are managed by `AddonManager` and each add-on must inherit from the `GPAddon` base class defined in `headers/gpaddon.h`.
+
+### The `GPAddon` interface
+
+```cpp
+// headers/gpaddon.h
+class GPAddon
+{
+public:
+    virtual ~GPAddon() { }
+    virtual bool available() = 0;       // Return true if this add-on should be active
+    virtual void setup() = 0;           // One-time initialization
+    virtual void process() = 0;         // Called each input cycle (core 0)
+    virtual void preprocess() = 0;      // Called before main gamepad processing
+    virtual void postprocess(bool) = 0; // Called after main gamepad processing
+    virtual std::string name() = 0;     // Human-readable add-on name
+    virtual void reinit() = 0;          // Re-initialize after config changes (e.g. pin reassignment)
+
+    virtual USBListener * getListener() { return listener; }
+
+protected:
+    USBListener * listener;
+};
+```
+
+| Method | When to implement |
+|---|---|
+| `available()` | Check storage/config to decide if the add-on is enabled. Return `false` to skip all other methods. |
+| `setup()` | Initialize GPIO, I2C, SPI, or other hardware. Called once at boot. |
+| `process()` | Modify gamepad state each cycle. Keep this fast. |
+| `preprocess()` | Run before the core gamepad logic if your add-on needs to intercept raw input. |
+| `postprocess(bool)` | Run after gamepad state has been finalized. |
+| `reinit()` | Rebuild pin masks or state when the user changes pin assignments via the web configurator. |
+
+### Registering a new add-on
+
+Add-ons are registered in `src/addonmanager.cpp`. Include your add-on header and add it to the registration list. The `AddonManager` calls `available()` at startup; if it returns `true`, the add-on is initialized with `setup()` and included in the processing loop.
+
+## Driver architecture
+
+USB protocol drivers inherit from `GPDriver` defined in `headers/gpdriver.h`. Drivers handle USB descriptor callbacks, HID report generation, and vendor control transfers for a specific input mode (XInput, PS4, Switch, etc.).
+
+```cpp
+// headers/gpdriver.h (key methods)
+class GPDriver {
+public:
+    virtual void initialize() = 0;
+    virtual bool process(Gamepad * gamepad) = 0;
+    virtual uint16_t get_report(uint8_t report_id, hid_report_type_t report_type,
+                                uint8_t *buffer, uint16_t reqlen) = 0;
+    virtual void set_report(uint8_t report_id, hid_report_type_t report_type,
+                            uint8_t const *buffer, uint16_t bufsize) = 0;
+    // ... USB descriptor callbacks
+};
+```
+
+New input modes require implementing all pure virtual methods and registering the driver with `DriverManager`.
+
+## Community and support
+
+| Resource | Link |
+|---|---|
+| GitHub repository | [OpenStickCommunity/GP2040-CE](https://github.com/OpenStickCommunity/GP2040-CE) |
+| Discord server | [discord.gg/k2pxhke7q8](https://discord.gg/k2pxhke7q8) |
+| Bug reports and feature requests | [GitHub Issues](https://github.com/OpenStickCommunity/GP2040-CE/issues) |
+| Full documentation | [gp2040-ce.info](https://gp2040-ce.info) |

@@ -1,0 +1,75 @@
+---
+title: Add-ons overview
+description: Add-ons are modular feature extensions for GP2040-CE that can be enabled or disabled individually through the web configurator.
+---
+
+Add-ons are optional firmware modules that extend the capabilities of a GP2040-CE device beyond basic button and directional input. Each add-on is independently enabled and configured through the **Add-ons Config** page in the web configurator. Disabling an add-on has no effect on other add-ons or core input handling.
+
+## Enabling add-ons
+
+<Steps>
+  <Step title="Open the web configurator">
+    Connect your GP2040-CE device while holding the designated web config button, then navigate to `http://192.168.7.1` in a browser.
+  </Step>
+  <Step title="Navigate to Add-ons Config">
+    Select **Add-ons Config** from the main navigation menu.
+  </Step>
+  <Step title="Enable the desired add-on">
+    Each add-on section has an **Enabled** toggle switch. Flip the switch to enable the add-on, then configure the available options that appear.
+  </Step>
+  <Step title="Save your settings">
+    Click **Save** at the bottom of the page. The device applies the new configuration immediately.
+  </Step>
+</Steps>
+
+<Note>
+  Some add-ons require specific hardware (dedicated GPIO pins, ADC-capable pins, or USB host circuitry). Enabling an add-on without the required hardware will have no effect.
+</Note>
+
+## Available add-ons
+
+<CardGroup cols={2}>
+  <Card title="Analog Input" icon="joystick" href="/add-ons/analog-input">
+    Maps ADC-capable GPIO pins (GPIO 26–29) to left or right analog stick axes. Supports two independent joystick pairs, deadzone configuration, auto-calibration, and EMA smoothing.
+  </Card>
+  <Card title="Turbo" icon="bolt" href="/add-ons/turbo">
+    Rapid-fires any combination of face or shoulder buttons at a configurable rate of 2–30 shots per second. Includes SHMUP mode with charge shot support and an optional turbo indicator LED.
+  </Card>
+  <Card title="SOCD Slider" icon="sliders" href="/add-ons/socd-cleaning">
+    Uses physical GPIO pins as a hardware switch to change the active SOCD cleaning mode on the fly, overriding the global SOCD setting.
+  </Card>
+  <Card title="RGB LEDs / NeoPixel" icon="lightbulb" href="/add-ons/rgb-leds">
+    Drives WS2812B (NeoPixel) LED strips for per-button reactive lighting, player indicator LEDs, and ambient case RGB. Supports multiple animation effects and LED data formats.
+  </Card>
+  <Card title="Input Macros" icon="list" href="/add-ons/input-macros">
+    Plays back automated button sequences triggered by a single button press. Supports on-press, hold-repeat, and toggle trigger modes. Up to 6 macros, each with up to 30 inputs.
+  </Card>
+  <Card title="USB Host" icon="usb" href="/add-ons/usb-host">
+    Connects a wired USB gamepad to the GP2040-CE device and passes its input through to the host system. Requires USB host hardware support on the board.
+  </Card>
+</CardGroup>
+
+### Additional add-ons
+
+The following add-ons are available in GP2040-CE but do not have dedicated pages in this section:
+
+| Add-on | Description |
+|---|---|
+| **Rotary Encoder** | Maps a rotary encoder to analog axes, triggers, or D-pad directions. Configurable pulses per revolution, wrap-around, and multiplier. |
+| **Wii Extension** | Reads input from Wii Nunchuk, Classic Controller, Guitar, Drum, Taiko, and Turntable accessories over I2C. |
+| **SNES Input** | Reads a Super Nintendo controller using the serial clock/latch/data protocol. |
+| **TG16 Input** | Reads a PC Engine / TurboGrafx-16 controller using its OE/select/data protocol. |
+| **Buzzer Speaker** | Plays tones on a connected passive buzzer for audio feedback. |
+| **Hall Effect Trigger (HE Trigger)** | Maps Hall Effect sensors to button actions with configurable active, idle, and pressed thresholds, plus optional rapid trigger. |
+| **I2C GPIO Expander (PCF8575)** | Adds up to 16 additional digital inputs via a PCF8575 I2C I/O expander. |
+| **DRV8833 Rumble** | Drives left and right rumble motors through a DRV8833 H-bridge driver. |
+| **Keyboard Host** | Reads a connected USB keyboard and maps keys to gamepad buttons or mouse movement. |
+| **Focus Mode** | Locks specific inputs (buttons, OLED, RGB, macros) to prevent accidental changes during competitive play. |
+| **Tilt Input** | Applies fractional analog stick scaling when tilt modifier buttons are held. |
+| **Dual Directional Input** | Adds a second set of digital directional inputs that combine with or operate independently from the primary D-pad. |
+| **Reverse Input** | Inverts directional inputs when a designated reverse button is pressed. |
+| **Board LED** | Controls the onboard LED to indicate input mode, act as an input test indicator, or reflect PS authentication state. |
+| **BOOTSEL Button** | Maps the BOOTSEL button on the RP2040 to a gamepad button action. |
+| **Player Number LED** | Drives PWM or RGB LEDs to show the player number assigned by the host console. |
+| **Reactive LED** | Drives individual GPIO-connected LEDs that change state based on button press or release events. |
+| **I2C Analog (ADS1219 / ADS1256)** | Reads high-precision analog values from ADS1219 (I2C) or ADS1256 (SPI) ADC chips. |
